@@ -1,4 +1,3 @@
-#include<iostream>
 #include<stdio.h>
 #include<unistd.h> // contains read, write, close sys calls
 #include<cstring>
@@ -8,6 +7,7 @@
 #include<libgen.h> // for basename function
 #include<sys/stat.h>
 #include<sys/types.h> // mode_t
+#include<iostream>
 
 // function to print onto the console, this is just like the wrapper of printf 
 void printOnConsole(const char *msg) {
@@ -42,11 +42,13 @@ long long isBlockSizeValid(const char *c) {
         _exit(1);
     }
 
+    // block size must be positive value
     if(blocksize<=0) {
         printOnConsole("Block size should be positive\n");
         _exit(1);
     }
 
+    // to avoid overflow 
     if(blocksize>maxBlockSize) {
         printOnConsole("Block size is too large\n");
         _exit(1);
@@ -86,11 +88,7 @@ void printInteger(long long number) {
 // checks whether file exists or its has required permissions 
 void fileValidation(int fileDesc) {
     if (fileDesc == -1) {
-        if (errno == ENOENT) {
-            printOnConsole(strerror(errno));
-            printOnConsole("\n");
-            _exit(1);
-        } else if (errno == EACCES) {
+        if (errno==ENOENT || errno==EACCES) {
             printOnConsole(strerror(errno));
             printOnConsole("\n");
             _exit(1);
@@ -105,12 +103,7 @@ void readContentsOfFile(int fileDesc) {
     while ((infoRead = read(fileDesc, buffer, sizeof(buffer))) > 0) {
         write(1, buffer, infoRead);
     }
-
-    if (infoRead == -1) {
-        printOnConsole("Error in reading of the file\n");
-        close(fileDesc);
-        _exit(1);
-    }
+    // add condition that error while reading 
 }
 
 // directory creation with read, write and execute permissions 
@@ -118,53 +111,63 @@ void createDirectory(const char *directoryName) {
     struct stat stats;
 
     // Check if the directory exists
-    if (stat(directoryName, &stats) == 0) {
+    if (stat(directoryName,&stats)==0) {
         // st_mode returns true if it is a directory 
-        if(S_ISDIR(stats.st_mode)) {
-            printOnConsole(directoryName);
-            printOnConsole(" already exists\n");
-            // printf("Permissions: %o\n", stats.st_mode & 0777); 
-            return;
-        } 
-        else {
-            printOnConsole(directoryName);
-            printOnConsole(" exists but is not a directory\n");
-            _exit(1);
-        }
+        printOnConsole(directoryName);
+        printOnConsole(" already exists\n");
+        // printf("Permissions: %o\n", stats.st_mode & 0777); 
+        return;
     }
 
     // Create directory and give user permissions of read, write and execute
-    if (mkdir(directoryName, 0700) == -1) {
-        perror("Error while creating directory named 'Assignment1'\n");
-        _exit(1);
-    } 
     else {
+        mkdir(directoryName, 0700);
         printOnConsole("Directory 'Assignment1' created successfully\n");
     }
 }
 
-// function to reverse the contents of the single block 
-void reverseSingleBlock(char *block, ssize_t sizeOfBlock) {
-    for(ssize_t i=0;i<sizeOfBlock/2;++i) {
-        char temp = block[i];
-        block[i] = block[sizeOfBlock-i-1];
-        block[sizeOfBlock-i-1] = temp;
+// function to perform block wise reversal
+void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long blockSize, off_t fileSize) {
+    // allocating in the heap so that there won't be any stack overflow 
+    char *buffer = (char*)malloc(blockSize);
+    off_t offset = 0; 
+
+    while (offset<fileSize) {
+        ssize_t bytesToRead = blockSize;
+
+        // when the last remaining characters are less than the block size then it will just consider the remaining characters
+        // this will also handle when the block size is greater than the file size 
+        if (offset+blockSize>fileSize) {
+            bytesToRead = fileSize-offset;
+        }
+
+        // Move to correct offset in input file
+        lseek(inputFileDesc, offset, SEEK_SET);
+        // Read the block and pass into the buffer block
+        ssize_t totalBytesRead = read(inputFileDesc, buffer, bytesToRead);
+        // Reverse the contents of the current block
+        for(ssize_t i=0;i<blockSize/2;++i) {
+            char temp = buffer[i];
+            buffer[i] = buffer[blockSize-i-1];
+            buffer[blockSize-i-1] = temp;
+        }
+        // Write to the output file
+        write(outputFileDesc, buffer, totalBytesRead);
+        // update the offset value 
+        offset += totalBytesRead;
     }
+    free(buffer);
 }
 
 // file creation with read and write permissions 
 int createOuputFile(const char *directoryName, const char *filepath, long long flag) {
-    char *pathCopy = strdup(filepath);
+    char *copyOfPath = strdup(filepath);
 
     // converting flag from long long to string
     char buffer[64]; 
     snprintf(buffer,sizeof(buffer),"%lld",flag);
 
-    if (pathCopy == NULL) {
-        printOnConsole("Couldn't allocate memory to the file\n");
-        _exit(1);
-    }
-    const char* outputFileName = basename(pathCopy);   // base name of the file 
+    const char* outputFileName = basename(copyOfPath);   // base name of the file 
     const char* suffix = "_";
     // Prepare full output path: "Assignment1/flag_<input_file_name>"
     char fullPath[1024];
@@ -173,21 +176,7 @@ int createOuputFile(const char *directoryName, const char *filepath, long long f
     // Create file with read, wirte permissions to the users 
     // O_CREAT creates the file if it doesn’t exist, O_WRONGLY opens the file in write only and
     // O_TRUNC if the file exists then this clears the content 
-    int outputFileDesc = open(fullPath, O_CREAT | O_WRONLY | O_TRUNC, 0600); // read and write permissions
-    if (outputFileDesc == -1) {
-        perror("Failed to create output file");
-        free(pathCopy);
-        _exit(1);
-    }
-
-    // Printing details of the path where output file was created 
-    write(1, "Output file created at: ", 25);
-    write(1, fullPath, strlen(fullPath));
-    write(1, "\n", 1);
-
-    free(pathCopy);
-
-    return outputFileDesc;
+    return open(fullPath, O_CREAT | O_WRONLY | O_TRUNC, 0600); // read and write permissions
 }
 
 int main(int argc, char *argv[]) {
@@ -259,6 +248,7 @@ int main(int argc, char *argv[]) {
                 int outputFileDesc = createOuputFile(directName,filepath,(long long)flag);
 
                 // Do block wise reversal 
+                performBlockwiseReversal(originalFileDesc, outputFileDesc, blocksize, originalFileSize);
 
                 // close the file 
                 close(originalFileDesc);
