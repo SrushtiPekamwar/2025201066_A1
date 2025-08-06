@@ -35,21 +35,21 @@ void printCommandUsage() {
 // function to check whether the given block size is valid integer or not 
 long long isBlockSizeValid(const char *c) {
     const long long maxBlockSize = LLONG_MAX;
-    char* endptr;
+    char* endptr;  // endptr will point to the first invalid character after the number.
     long long blocksize = strtoll(c, &endptr, 10);
     if (*endptr != '\0') {
         printOnConsole("Invalid block size, block size must be an integer\n");
-        return -1;
+        _exit(1);
     }
 
-    if(blocksize<0) {
+    if(blocksize<=0) {
         printOnConsole("Block size should be positive\n");
-        return -1;
+        _exit(1);
     }
 
     if(blocksize>maxBlockSize) {
         printOnConsole("Block size is too large\n");
-        return -1;
+        _exit(1);
     }
 
     return blocksize;
@@ -73,7 +73,7 @@ int isFlagValid(const char *c) {
         printCommandUsage();
         _exit(1);
     }
-    return flag;
+    return (int)flag;
 }
 
 // function to print the integers by converting it into string 
@@ -87,10 +87,12 @@ void printInteger(long long number) {
 void fileValidation(int fileDesc) {
     if (fileDesc == -1) {
         if (errno == ENOENT) {
-            perror("File does not exist");
+            printOnConsole(strerror(errno));
+            printOnConsole("\n");
             _exit(1);
         } else if (errno == EACCES) {
-            perror("You don't have required permissions to access this file");
+            printOnConsole(strerror(errno));
+            printOnConsole("\n");
             _exit(1);
         }
     }
@@ -117,33 +119,76 @@ void createDirectory(const char *directoryName) {
 
     // Check if the directory exists
     if (stat(directoryName, &stats) == 0) {
+        // st_mode returns true if it is a directory 
         if(S_ISDIR(stats.st_mode)) {
             printOnConsole(directoryName);
-            printOnConsole(" already exists");
-            // check what permissions are present for the directory
-            printf("Permissions: %o\n", stats.st_mode & 0777); 
+            printOnConsole(" already exists\n");
+            // printf("Permissions: %o\n", stats.st_mode & 0777); 
             return;
         } 
         else {
             printOnConsole(directoryName);
-            perror(" exists but is not a directory");
+            printOnConsole(" exists but is not a directory\n");
             _exit(1);
         }
     }
 
     // Create directory and give user permissions of read, write and execute
-    else if (mkdir(directoryName, 0700) == -1) {
-        perror("Error while creating directory named 'Assignment1'");
+    if (mkdir(directoryName, 0700) == -1) {
+        perror("Error while creating directory named 'Assignment1'\n");
         _exit(1);
     } 
     else {
-        printOnConsole("Directory 'Assignment1' created successfully.\n");
-        // check what permissions are present for the directory
-        printf("Permissions: %o\n", stats.st_mode & 0777);  
+        printOnConsole("Directory 'Assignment1' created successfully\n");
+    }
+}
+
+// function to reverse the contents of the single block 
+void reverseSingleBlock(char *block, ssize_t sizeOfBlock) {
+    for(ssize_t i=0;i<sizeOfBlock/2;++i) {
+        char temp = block[i];
+        block[i] = block[sizeOfBlock-i-1];
+        block[sizeOfBlock-i-1] = temp;
     }
 }
 
 // file creation with read and write permissions 
+int createOuputFile(const char *directoryName, const char *filepath, long long flag) {
+    char *pathCopy = strdup(filepath);
+
+    // converting flag from long long to string
+    char buffer[64]; 
+    snprintf(buffer,sizeof(buffer),"%lld",flag);
+
+    if (pathCopy == NULL) {
+        printOnConsole("Couldn't allocate memory to the file\n");
+        _exit(1);
+    }
+    const char* outputFileName = basename(pathCopy);   // base name of the file 
+    const char* suffix = "_";
+    // Prepare full output path: "Assignment1/flag_<input_file_name>"
+    char fullPath[1024];
+    snprintf(fullPath, sizeof(fullPath), "%s/%s%s%s", directoryName, buffer, suffix, outputFileName);
+
+    // Create file with read, wirte permissions to the users 
+    // O_CREAT creates the file if it doesn’t exist, O_WRONGLY opens the file in write only and
+    // O_TRUNC if the file exists then this clears the content 
+    int outputFileDesc = open(fullPath, O_CREAT | O_WRONLY | O_TRUNC, 0600); // read and write permissions
+    if (outputFileDesc == -1) {
+        perror("Failed to create output file");
+        free(pathCopy);
+        _exit(1);
+    }
+
+    // Printing details of the path where output file was created 
+    write(1, "Output file created at: ", 25);
+    write(1, fullPath, strlen(fullPath));
+    write(1, "\n", 1);
+
+    free(pathCopy);
+
+    return outputFileDesc;
+}
 
 int main(int argc, char *argv[]) {
     if(argc<3) {
@@ -171,9 +216,6 @@ int main(int argc, char *argv[]) {
         else {
             // ./a.out <input_file> 0 <block_size>
             const char* filepath = argv[1];
-            char* pathCopy = strdup(filepath); 
-            // we can get the file name using basname 
-            char* originalFilename = basename(pathCopy);
 
             char *endptr;
             long long blocksize = isBlockSizeValid(argv[3]);
@@ -181,10 +223,6 @@ int main(int argc, char *argv[]) {
             // the property of stroll is that it will read only till the digits are present 
             // if it is 123ds then it will read till 123 and then endptr will not return 
             if(blocksize==-1) {
-                return 1;
-            }
-            else if(blocksize==0) {
-                printOnConsole("Block size should be greater than 0\n");
                 return 1;
             }
             // block size is valid and now perform the operation 
@@ -205,11 +243,6 @@ int main(int argc, char *argv[]) {
                 // reading and printing the contents of the file
                 // readContentsOfFile(originalFileDesc);
 
-                /* create new file and then reverse the content in the another file
-                before creating new file check whether the folder exists or not 
-                then create new file with the format Assignment1/0_<input_file_name>
-                now do blockwise reversal */
-
                 struct stat fileStat;
                 if (fstat(originalFileDesc, &fileStat) == -1) {
                     perror("\nError with fstat");
@@ -219,7 +252,13 @@ int main(int argc, char *argv[]) {
                 off_t originalFileSize = fileStat.st_size;  
 
                 // directory creation 
-                createDirectory("Assignment1");
+                const char * directName = "Assignment1";
+                createDirectory(directName);
+
+                // descriptor for output file
+                int outputFileDesc = createOuputFile(directName,filepath,(long long)flag);
+
+                // Do block wise reversal 
 
                 // close the file 
                 close(originalFileDesc);
