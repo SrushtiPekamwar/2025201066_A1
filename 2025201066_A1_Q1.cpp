@@ -13,11 +13,11 @@ for flag 2:
     Output file: Assignment1/2_<input_file_name>
 */
 
+#include<iostream>
 #include<stdio.h>
 #include<unistd.h> // contains read, write, close sys calls
 #include<cstring>
 #include<cstdlib>
-#include<iostream>
 #include<fcntl.h> // contains open sys call
 #include<errno.h>
 
@@ -59,6 +59,27 @@ long long isBlockSizeValid(const char *c) {
     return blocksize;
 }
 
+// function to check whether the value of flag is valid
+int isFlagValid(const char *c) {
+    char* endptr;
+    long long flag = strtoll(c, &endptr, 10);
+
+    // Check if input is a valid integer
+    if (*endptr != '\0') {
+        printOnConsole("Flag value must be an integer either 0, 1 or 2\n\n");
+        printCommandUsage();
+        _exit(1);
+    }
+
+    // Check if flag is in allowed range
+    if (flag != 0 && flag != 1 && flag != 2) {
+        printOnConsole("Invalid flag value, valid flags values are 0, 1, or 2\n\n");
+        printCommandUsage();
+        _exit(1);
+    }
+    return flag;
+}
+
 // function to print the integers by converting it into string 
 void printInteger(long long number) {
     char buffer[64]; 
@@ -79,19 +100,18 @@ void fileValidation(int fileDesc) {
     }
 }
 
-bool readContentsOfFile(int fileDesc) {
+void readContentsOfFile(int fileDesc) {
     char buffer[1024];
-    ssize_t bytesRead;
-    while ((bytesRead = read(fileDesc, buffer, sizeof(buffer))) > 0) {
-        write(1, buffer, bytesRead);
+    ssize_t infoRead;
+    while ((infoRead = read(fileDesc, buffer, sizeof(buffer))) > 0) {
+        write(1, buffer, infoRead);
     }
 
-    if (bytesRead == -1) {
+    if (infoRead == -1) {
         printOnConsole("Error in reading of the file\n");
         close(fileDesc);
-        return false;
+        _exit(1);
     }
-    return true;
 }
 
 int main(int argc, char *argv[]) {
@@ -108,7 +128,7 @@ int main(int argc, char *argv[]) {
     }
 
     // flag is integer but we get string type from the console 
-    int flag = atoi(argv[2]);
+    long long flag = isFlagValid(argv[2]);
 
     //-------------------------------flag 0 is used to do block-wise reversal---------------------------
     if(flag==0) {
@@ -128,6 +148,10 @@ int main(int argc, char *argv[]) {
             if(blocksize==-1) {
                 return 1;
             }
+            else if(blocksize==0) {
+                printOnConsole("Block size should be greater than 0\n");
+                return 1;
+            }
             else {
                 // print the flag 
                 printOnConsole("Flag: ");
@@ -144,8 +168,8 @@ int main(int argc, char *argv[]) {
                 fileValidation(originalFileDesc);
                 printOnConsole("File opened successfully\n");
 
-                // reading the contents of the file
-                if(readContentsOfFile(originalFileDesc)==false) return 1;
+                // reading and printing the contents of the file
+                readContentsOfFile(originalFileDesc);
 
                 // create new file and then reverse the content in the another file 
                 // new file must follow this format Assignment1/0_<input_file_name>
@@ -180,12 +204,6 @@ int main(int argc, char *argv[]) {
             // get the filename, flag, start index and the end index
             // start index can't be greater than end index 
         }
-    }
-
-    else {
-        printOnConsole("Invalid flag value. Valid flags are 0,1,2\n");
-        printCommandUsage();
-        return 1;
     }
 
     return 0;
