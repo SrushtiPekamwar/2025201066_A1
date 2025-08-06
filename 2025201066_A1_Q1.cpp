@@ -124,13 +124,12 @@ void progressBar(int totalProgress) {
     printOnConsole("\r[");
     for (int i = 0; i < 40; ++i) {
         if (i < (totalProgress * 40) / 100) {
-            printOnConsole(".");
+            printOnConsole("=");
         } else {
-            printOnConsole("#");
+            printOnConsole(".");
         }
     }
 
-    // Create percentage string
     char buffer[16];
     snprintf(buffer, sizeof(buffer), "] %d%%", totalProgress);
     printOnConsole(buffer);
