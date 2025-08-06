@@ -1,18 +1,3 @@
-/* 
-command line 
-$ g++ Q1.cpp
-$ ./a.out <input file name> <flag> [additional arguments]
-for flag 0: 
-    Usage: ./a.out <input_file> 0 <block_size>
-    Output file: Assignment1/0_<input_file_name>
-for flag 1: 
-    Usage: ./a.out <input_file> 1
-    Output file: Assignment1/1_<input_file_name>
-for flag 2: 
-    Usage: ./a.out <input_file> 2 <start_index> <end_index>
-    Output file: Assignment1/2_<input_file_name>
-*/
-
 #include<iostream>
 #include<stdio.h>
 #include<unistd.h> // contains read, write, close sys calls
@@ -21,6 +6,8 @@ for flag 2:
 #include<fcntl.h> // contains open sys call
 #include<errno.h>
 #include<libgen.h> // for basename function
+#include<sys/stat.h>
+#include<sys/types.h> // mode_t
 
 // function to print onto the console, this is just like the wrapper of printf 
 void printOnConsole(const char *msg) {
@@ -100,15 +87,16 @@ void printInteger(long long number) {
 void fileValidation(int fileDesc) {
     if (fileDesc == -1) {
         if (errno == ENOENT) {
-            printOnConsole("File does not exist\n");
+            perror("File does not exist");
             _exit(1);
         } else if (errno == EACCES) {
-            printOnConsole("You don't have required permissions to access this file\n");
+            perror("You don't have required permissions to access this file");
             _exit(1);
         }
     }
 }
 
+// function to read from the file 
 void readContentsOfFile(int fileDesc) {
     char buffer[1024];
     ssize_t infoRead;
@@ -122,6 +110,40 @@ void readContentsOfFile(int fileDesc) {
         _exit(1);
     }
 }
+
+// directory creation with read, write and execute permissions 
+void createDirectory(const char *directoryName) {
+    struct stat stats;
+
+    // Check if the directory exists
+    if (stat(directoryName, &stats) == 0) {
+        if(S_ISDIR(stats.st_mode)) {
+            printOnConsole(directoryName);
+            printOnConsole(" already exists");
+            // check what permissions are present for the directory
+            printf("Permissions: %o\n", stats.st_mode & 0777); 
+            return;
+        } 
+        else {
+            printOnConsole(directoryName);
+            perror(" exists but is not a directory");
+            _exit(1);
+        }
+    }
+
+    // Create directory and give user permissions of read, write and execute
+    else if (mkdir(directoryName, 0700) == -1) {
+        perror("Error while creating directory named 'Assignment1'");
+        _exit(1);
+    } 
+    else {
+        printOnConsole("Directory 'Assignment1' created successfully.\n");
+        // check what permissions are present for the directory
+        printf("Permissions: %o\n", stats.st_mode & 0777);  
+    }
+}
+
+// file creation with read and write permissions 
 
 int main(int argc, char *argv[]) {
     if(argc<3) {
@@ -165,33 +187,39 @@ int main(int argc, char *argv[]) {
                 printOnConsole("Block size should be greater than 0\n");
                 return 1;
             }
+            // block size is valid and now perform the operation 
             else {
-                // print the flag 
-                // printOnConsole("Flag: ");
-                // printInteger(flag);
-                // printOnConsole("\nBlock size: ");
-                // printInteger(blocksize);
-                // printOnConsole("\n");
-
-                // block size is valid and now perform the operation 
+                printOnConsole("Flag: ");
+                printInteger(flag);
+                printOnConsole("\nBlock size: ");
+                printInteger(blocksize);
+                printOnConsole("\n");
 
                 // open the file in read only 
                 int originalFileDesc = open(filepath, O_RDONLY); 
-                
+
                 // validating the file 
                 fileValidation(originalFileDesc);
                 printOnConsole("File opened successfully\n");
 
                 // reading and printing the contents of the file
-                readContentsOfFile(originalFileDesc);
+                // readContentsOfFile(originalFileDesc);
 
-                // create new file and then reverse the content in the another file
+                /* create new file and then reverse the content in the another file
+                before creating new file check whether the folder exists or not 
+                then create new file with the format Assignment1/0_<input_file_name>
+                now do blockwise reversal */
 
-                // before creating new file check whether the folder exists or not 
-                // then create new file with the format Assignment1/0_<input_file_name>
+                struct stat fileStat;
+                if (fstat(originalFileDesc, &fileStat) == -1) {
+                    perror("\nError with fstat");
+                    return 1;
+                }
+                // off_t is 64 bits and hence can store till ~8 exa bytes
+                off_t originalFileSize = fileStat.st_size;  
 
-                // now do blockwise reversal
-
+                // directory creation 
+                createDirectory("Assignment1");
 
                 // close the file 
                 close(originalFileDesc);
