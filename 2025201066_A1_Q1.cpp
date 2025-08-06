@@ -20,6 +20,7 @@ for flag 2:
 #include<cstdlib>
 #include<fcntl.h> // contains open sys call
 #include<errno.h>
+#include<libgen.h> // for basename function
 
 // function to print onto the console, this is just like the wrapper of printf 
 void printOnConsole(const char *msg) {
@@ -46,16 +47,24 @@ void printCommandUsage() {
 
 // function to check whether the given block size is valid integer or not 
 long long isBlockSizeValid(const char *c) {
+    const long long maxBlockSize = LLONG_MAX;
     char* endptr;
     long long blocksize = strtoll(c, &endptr, 10);
     if (*endptr != '\0') {
         printOnConsole("Invalid block size, block size must be an integer\n");
         return -1;
     }
-    else if(blocksize<0) {
+
+    if(blocksize<0) {
         printOnConsole("Block size should be positive\n");
         return -1;
     }
+
+    if(blocksize>maxBlockSize) {
+        printOnConsole("Block size is too large\n");
+        return -1;
+    }
+
     return blocksize;
 }
 
@@ -116,13 +125,13 @@ void readContentsOfFile(int fileDesc) {
 
 int main(int argc, char *argv[]) {
     if(argc<3) {
-        printOnConsole("Few arguments\n");
+        printOnConsole("Number of arguments are fewer than expected\n");
         printCommandUsage();
         return 1;
     }
 
     else if(argc>5) {
-        printOnConsole("Too many arguments\n");
+        printOnConsole("Number of arguments are greater than expected\n");
         printCommandUsage();
         return 1;
     }
@@ -139,7 +148,11 @@ int main(int argc, char *argv[]) {
         }
         else {
             // ./a.out <input_file> 0 <block_size>
-            const char* filename = argv[1];
+            const char* filepath = argv[1];
+            char* pathCopy = strdup(filepath); 
+            // we can get the file name using basname 
+            char* originalFilename = basename(pathCopy);
+
             char *endptr;
             long long blocksize = isBlockSizeValid(argv[3]);
 
@@ -154,16 +167,17 @@ int main(int argc, char *argv[]) {
             }
             else {
                 // print the flag 
-                printOnConsole("Flag: ");
-                printInteger(flag);
-                printOnConsole("\nBlock size: ");
-                printInteger(blocksize);
-                printOnConsole("\n");
+                // printOnConsole("Flag: ");
+                // printInteger(flag);
+                // printOnConsole("\nBlock size: ");
+                // printInteger(blocksize);
+                // printOnConsole("\n");
 
                 // block size is valid and now perform the operation 
 
                 // open the file in read only 
-                int originalFileDesc = open(filename, O_RDONLY); 
+                int originalFileDesc = open(filepath, O_RDONLY); 
+                
                 // validating the file 
                 fileValidation(originalFileDesc);
                 printOnConsole("File opened successfully\n");
@@ -171,8 +185,12 @@ int main(int argc, char *argv[]) {
                 // reading and printing the contents of the file
                 readContentsOfFile(originalFileDesc);
 
-                // create new file and then reverse the content in the another file 
-                // new file must follow this format Assignment1/0_<input_file_name>
+                // create new file and then reverse the content in the another file
+
+                // before creating new file check whether the folder exists or not 
+                // then create new file with the format Assignment1/0_<input_file_name>
+
+                // now do blockwise reversal
 
 
                 // close the file 
