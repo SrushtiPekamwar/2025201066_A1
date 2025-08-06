@@ -13,12 +13,13 @@ for flag 2:
     Output file: Assignment1/2_<input_file_name>
 */
 
-
+#include<stdio.h>
 #include<unistd.h>
 #include<cstring>
 #include<cstdlib>
+#include<iostream>
 
-
+// function to print onto the console, this is just like the wrapper of printf 
 void printOnConsole(const char *msg) {
     // ssize_t is the type which is used as return type to many sys calls 
     ssize_t e = write(1,msg,strlen(msg));
@@ -31,12 +32,28 @@ void printOnConsole(const char *msg) {
     }
 }
 
+// function to print the usage of the command 
 void printCommandUsage() {
     printOnConsole("-------------------------------Command usage-------------------------------\n");
     printOnConsole("Blockwise reversal     : ./a.out <input_file> 0 <block_size>\n");
     printOnConsole("Full file reversal     : ./a.out <input_file> 1\n");
     printOnConsole("Partial range reversal : ./a.out <input_file> 2 <start_index> <end_index>\n");
     printOnConsole("---------------------------------------------------------------------------\n\n");
+}
+
+// function to check whether the given block size is valid integer or not 
+long long isBlockSizeValid(const char *c) {
+    char* endptr;
+    long long blocksize = strtoll(c, &endptr, 10);
+    if (*endptr != '\0') {
+        printOnConsole("Invalid block size, block size must be an integer\n");
+        return -1;
+    }
+    else if(blocksize<0) {
+        printOnConsole("Block size should be positive\n");
+        return -1;
+    }
+    return blocksize;
 }
 
 int main(int argc, char *argv[]) {
@@ -62,7 +79,19 @@ int main(int argc, char *argv[]) {
             return 1;
         }
         else {
+            // ./a.out <input_file> 0 <block_size>
+            const char* filename = argv[1];
+            char *endptr;
+            long long blocksize = isBlockSizeValid(argv[3]);
 
+            // the property of stroll is that it will read only till the digits are present 
+            // if it is 123ds then it will read till 123 and then endptr will not return 
+            if(blocksize==-1) {
+                return 1;
+            }
+            else {
+                // block size is valid and now perform the operation 
+            }
         }
     }
 
@@ -73,7 +102,7 @@ int main(int argc, char *argv[]) {
             return 1;
         }
         else {
-
+            // get the filename, flag
         }
     }
 
@@ -84,7 +113,7 @@ int main(int argc, char *argv[]) {
             return 1;
         } 
         else {
-
+            // get the filename, flag, start index and the end index
         }
     }
 
