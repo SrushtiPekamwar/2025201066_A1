@@ -14,13 +14,16 @@ for flag 2:
 */
 
 #include<stdio.h>
-#include<unistd.h>
+#include<unistd.h> // contains read, write, close sys calls
 #include<cstring>
 #include<cstdlib>
 #include<iostream>
+#include<fcntl.h> // contains open sys call
+#include<errno.h>
 
 // function to print onto the console, this is just like the wrapper of printf 
 void printOnConsole(const char *msg) {
+    // write(int fd, const void *buf, size_t count)
     // ssize_t is the type which is used as return type to many sys calls 
     ssize_t e = write(1,msg,strlen(msg));
 
@@ -56,6 +59,42 @@ long long isBlockSizeValid(const char *c) {
     return blocksize;
 }
 
+// function to print the integers by converting it into string 
+void printInteger(long long number) {
+    char buffer[64]; 
+    snprintf(buffer,sizeof(buffer),"%lld",number);
+    printOnConsole(buffer);
+}
+
+// checks whether file exists or its has required permissions 
+bool fileValidation(int fileDesc) {
+    if (fileDesc == -1) {
+        if (errno == ENOENT) {
+            printOnConsole("File does not exist\n");
+            return false;
+        } else if (errno == EACCES) {
+            printOnConsole("You don't have required permissions to access this file\n");
+            return false;
+        }
+    }
+    return true;
+}
+
+bool readContentsOfFile(int fileDesc) {
+    char buffer[1024];
+    ssize_t bytesRead;
+    while ((bytesRead = read(fileDesc, buffer, sizeof(buffer))) > 0) {
+        write(1, buffer, bytesRead);
+    }
+
+    if (bytesRead == -1) {
+        printOnConsole("Error in reading of the file\n");
+        close(fileDesc);
+        return false;
+    }
+    return true;
+}
+
 int main(int argc, char *argv[]) {
     if(argc<3) {
         printOnConsole("Few arguments\n");
@@ -72,6 +111,7 @@ int main(int argc, char *argv[]) {
     // flag is integer but we get string type from the console 
     int flag = atoi(argv[2]);
 
+    //-------------------------------flag 0 is used to do block-wise reversal---------------------------
     if(flag==0) {
         if(argc!=4) {
             printOnConsole("Wrong number of arguments\n");
@@ -90,11 +130,38 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
             else {
+                // print the flag 
+                printOnConsole("Flag: ");
+                printInteger(flag);
+                printOnConsole("\nBlock size: ");
+                printInteger(blocksize);
+                printOnConsole("\n");
+
                 // block size is valid and now perform the operation 
+
+                // open the file in read only 
+                int originalFileDesc = open(filename, O_RDONLY); 
+
+                // validating the file 
+                if(fileValidation(originalFileDesc)==false) return 1;
+                else {
+                    printOnConsole("File opened successfully\n");
+                }
+
+                // reading the contents of the file
+                if(readContentsOfFile(originalFileDesc)==false) return 1;
+
+                // create new file and then reverse the content in the another file 
+                // new file must follow this format Assignment1/0_<input_file_name>
+
+
+                // close the file 
+                close(originalFileDesc);
             }
         }
     }
 
+    // flag 1 is used to do complete file reversal
     else if(flag==1) {
         if(argc!=3) {
             printOnConsole("Wrong number of arguments\n");
@@ -106,6 +173,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    // flag 2 is used to do the reversal in the given range of index
     else if(flag==2) {
         if(argc!=5) {
             printOnConsole("Wrong number of arguments\n");
@@ -114,6 +182,7 @@ int main(int argc, char *argv[]) {
         } 
         else {
             // get the filename, flag, start index and the end index
+            // start index can't be greater than end index 
         }
     }
 
