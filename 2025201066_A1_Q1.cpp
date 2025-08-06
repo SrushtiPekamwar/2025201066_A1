@@ -119,6 +119,24 @@ void createDirectory(const char *directoryName) {
     }
 }
 
+// updation progresss bar
+void progressBar(int totalProgress) {
+    printOnConsole("\r[");
+    for (int i = 0; i < 40; ++i) {
+        if (i < (totalProgress * 40) / 100) {
+            printOnConsole(".");
+        } else {
+            printOnConsole("#");
+        }
+    }
+
+    // Create percentage string
+    char buffer[16];
+    snprintf(buffer, sizeof(buffer), "] %d%%", totalProgress);
+    printOnConsole(buffer);
+    fflush(stdout);
+}
+
 // function to perform block wise reversal
 void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long blockSize, off_t fileSize) {
     // allocating in the heap so that there won't be any stack overflow 
@@ -148,10 +166,15 @@ void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long b
             buffer[i] = buffer[n-i-1];
             buffer[n-i-1] = temp;
         }
+
         // Write to the output file
         write(outputFileDesc, buffer, totalBytesRead);
         // update the index value 
         index += totalBytesRead;
+
+        int totalProgress = (index*100)/fileSize;
+        progressBar(totalProgress);
+        usleep(1000);
     }
     free(buffer);
 }
@@ -253,7 +276,7 @@ int main(int argc, char *argv[]) {
             return 1;
         }
         else {
-            // get the filename, flag
+            // get the filename and the flag
         }
     }
 
