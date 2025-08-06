@@ -67,17 +67,16 @@ void printInteger(long long number) {
 }
 
 // checks whether file exists or its has required permissions 
-bool fileValidation(int fileDesc) {
+void fileValidation(int fileDesc) {
     if (fileDesc == -1) {
         if (errno == ENOENT) {
             printOnConsole("File does not exist\n");
-            return false;
+            _exit(1);
         } else if (errno == EACCES) {
             printOnConsole("You don't have required permissions to access this file\n");
-            return false;
+            _exit(1);
         }
     }
-    return true;
 }
 
 bool readContentsOfFile(int fileDesc) {
@@ -141,12 +140,9 @@ int main(int argc, char *argv[]) {
 
                 // open the file in read only 
                 int originalFileDesc = open(filename, O_RDONLY); 
-
                 // validating the file 
-                if(fileValidation(originalFileDesc)==false) return 1;
-                else {
-                    printOnConsole("File opened successfully\n");
-                }
+                fileValidation(originalFileDesc);
+                printOnConsole("File opened successfully\n");
 
                 // reading the contents of the file
                 if(readContentsOfFile(originalFileDesc)==false) return 1;
