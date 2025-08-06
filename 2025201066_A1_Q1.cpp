@@ -215,44 +215,38 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
             // block size is valid and now perform the operation 
-            else {
-                printOnConsole("Flag: ");
-                printInteger(flag);
-                printOnConsole("\nBlock size: ");
-                printInteger(blocksize);
-                printOnConsole("\n");
+            // else {
+            //     printOnConsole("Flag: ");
+            //     printInteger(flag);
+            //     printOnConsole("\nBlock size: ");
+            //     printInteger(blocksize);
+            //     printOnConsole("\n");
 
-                // open the file in read only 
-                int originalFileDesc = open(filepath, O_RDONLY); 
+            // open the file in read only 
+            int originalFileDesc = open(filepath, O_RDONLY); 
 
-                // validating the file 
-                fileValidation(originalFileDesc);
-                printOnConsole("File opened successfully\n");
+            // validating the file 
+            fileValidation(originalFileDesc);
+            printOnConsole("File opened successfully\n");
 
-                // reading and printing the contents of the file
-                // readContentsOfFile(originalFileDesc);
+            struct stat fileStat;
+            fstat(originalFileDesc,&fileStat);
+            // off_t is 64 bits and hence can store till ~8 exa bytes
+            off_t originalFileSize = fileStat.st_size;  
 
-                struct stat fileStat;
-                if (fstat(originalFileDesc, &fileStat) == -1) {
-                    perror("\nError with fstat");
-                    return 1;
-                }
-                // off_t is 64 bits and hence can store till ~8 exa bytes
-                off_t originalFileSize = fileStat.st_size;  
+            // directory creation 
+            const char * directName = "Assignment1";
+            createDirectory(directName);
 
-                // directory creation 
-                const char * directName = "Assignment1";
-                createDirectory(directName);
+            // descriptor for output file
+            int outputFileDesc = createOuputFile(directName,filepath,(long long)flag);
 
-                // descriptor for output file
-                int outputFileDesc = createOuputFile(directName,filepath,(long long)flag);
+            // Do block wise reversal 
+            performBlockwiseReversal(originalFileDesc, outputFileDesc, blocksize, originalFileSize);
 
-                // Do block wise reversal 
-                performBlockwiseReversal(originalFileDesc, outputFileDesc, blocksize, originalFileSize);
-
-                // close the file 
-                close(originalFileDesc);
-            }
+            // close the file 
+            close(originalFileDesc);
+            close(outputFileDesc);
         }
     }
 
