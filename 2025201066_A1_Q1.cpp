@@ -123,19 +123,23 @@ void createDirectory(const char *directoryName) {
 void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long blockSize, off_t fileSize) {
     // allocating in the heap so that there won't be any stack overflow 
     char *buffer = (char*)malloc(blockSize);
-    off_t offset = 0; 
+    if(buffer==NULL) {
+        printOnConsole("Memory allocation was unsuccessful\n");
+        _exit(1);
+    }
 
-    while (offset<fileSize) {
+    off_t index = 0; 
+    while (index<fileSize) {
         ssize_t n = blockSize;
 
         // when the last remaining characters are less than the block size then it will just consider the remaining characters
         // this will also handle when the block size is greater than the file size 
-        if (offset+blockSize>fileSize) {
-            n = fileSize-offset;
+        if (index+blockSize>fileSize) {
+            n = fileSize-index;
         }
 
-        // Move to correct offset in input file
-        lseek(inputFileDesc, offset, SEEK_SET);
+        // Move to correct index in input file
+        lseek(inputFileDesc, index, SEEK_SET);
         // Read the block and pass into the buffer block
         ssize_t totalBytesRead = read(inputFileDesc, buffer, n);
         // Reverse the contents of the current block
@@ -146,8 +150,8 @@ void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long b
         }
         // Write to the output file
         write(outputFileDesc, buffer, totalBytesRead);
-        // update the offset value 
-        offset += totalBytesRead;
+        // update the index value 
+        index += totalBytesRead;
     }
     free(buffer);
 }
