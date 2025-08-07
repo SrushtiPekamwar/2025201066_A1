@@ -1,2 +1,131 @@
-Srushti Pekamwar
-Is doing this assignment
+ffer[n-i-1] = temp;
+        }
+        if(write(outputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while writing the file");
+            _exit(1);
+        };
+        index -= n;
+        progress += n;
+        int totalProgress = (progress*100)/filesize;
+        progressBar(totalProgress);
+        usleep(10000000);
+        ffer[n-i-1] = temp;
+        }
+        if(write(outputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while writing the file");
+            _exit(1);
+        };
+        index -= n;
+        progress += n;
+        int totalProgress = (progress*100)/filesize;
+        progressBar(totalProgress);
+        usleep(10000000);
+        ffer[n-i-1] = temp;
+        }
+        if(write(outputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while writing the file");
+            _exit(1);
+        };
+        index -= n;
+        progress += n;
+        int totalProgress = (progress*100)/filesize;
+        progressBar(totalProgress);
+        usleep(10000000);
+        ffer[n-i-1] = temp;
+        }
+        if(write(outputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while writing the file");
+            _exit(1);
+        };
+        index -= n;
+        progress += n;
+        int totalProgress = (progress*100)/filesize;
+        progressBar(totalProgress);
+        usleep(10000000);
+        ffer[n-i-1] = temp;
+        }
+        if(write(outputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while writing the file");
+            _exit(1);
+        };
+        index -= n;
+        progress += n;
+        int totalProgress = (progress*100)/filesize;
+        progressBar(totalProgress);
+        usleep(10000000);
+        ffer[n-i-1] = temp;
+        }
+        if(write(outputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while writing the file");
+            _exit(1);
+        };
+        index -= n;
+        progress += n;
+        int totalProgress = (progress*100)/filesize;
+        progressBar(totalProgress);
+        usleep(10000000);ffer[n-i-1] = temp;
+        }
+        if(write(outputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while writing the file");
+            _exit(1);
+        };
+        index -= n;
+        progress += n;
+        int totalProgress = (progress*100)/filesize;
+        progressBar(totalProgress);
+        usleep(10000000);
+        ffer[n-i-1] = temp;
+        }
+        if(write(outputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while writing the file");
+            _exit(1);
+        };
+        index -= n;
+        progress += n;
+        int totalProgress = (progress*100)/filesize;
+        progressBar(totalProgress);
+        usleep(10000000);
+
+        ffer[n-i-1] = temp;
+        }
+        if(write(outputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while writing the file");
+            _exit(1);
+        };
+        index -= n;
+        progress += n;
+        int totalProgress = (progress*100)/filesize;
+        progressBar(totalProgress);
+        usleep(10000000);
+        ffer[n-i-1] = temp;
+        }
+        if(write(outputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while writing the file");
+            _exit(1);
+        };
+        index -= n;
+        progress += n;
+        int totalProgress = (progress*100)/filesize;
+        progressBar(totalProgress);
+        usleep(10000000);
+        ffer[n-i-1] = temp;
+        }
+        if(write(outputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while writing the file");
+            _exit(1);
+        };
+        index -= n;
+        progress += n;
+        int totalProgress = (progress*100)/filesize;
+        progressBar(totalProgress);
+        usleep(10000000);ffer[n-i-1] = temp;
+        }
+        if(write(outputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while writing the file");
+            _exit(1);
+        };
+        index -= n;
+        progress += n;
+        int totalProgress = (progress*100)/filesize;
+        progressBar(totalProgress);
+        usleep(10000000);

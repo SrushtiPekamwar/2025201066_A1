@@ -9,6 +9,8 @@
 #include<sys/types.h> // mode_t
 #include<iostream>
 
+int sleepValue = 10000;
+
 // function to print onto the console, this is just like the wrapper of printf 
 void printOnConsole(const char *msg) {
     // ssize_t is the type which is used as return type to many sys calls 
@@ -132,7 +134,7 @@ void progressBar(int totalProgress) {
         if (i<(totalProgress*50)/100) {
             printOnConsole("#");
         } else {
-            printOnConsole("_");
+            printOnConsole("=");
         }
     }
     char buffer[16];
@@ -145,6 +147,7 @@ void progressBar(int totalProgress) {
 void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long blockSize, off_t fileSize) {
     // allocating in the heap so that there won't be any stack overflow 
     off_t index = 0;
+    off_t progress = 0;
     char *buffer = (char*)malloc(blockSize);
     if(buffer==NULL) {
         printOnConsole("Memory allocation was unsuccessful\n");
@@ -160,11 +163,11 @@ void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long b
             n = fileSize-index;
         }
 
-        if(lseek(inputFileDesc, index, SEEK_SET)==-1) {
+        if(lseek(inputFileDesc,index,SEEK_SET)==-1) {
             printOnConsole("Error while seeking the file");
             _exit(1);
         }
-        if(read(inputFileDesc, buffer, n)==-1) {
+        if(read(inputFileDesc,buffer,n)==-1) {
             printOnConsole("Error while reading the file");
             _exit(1);
         }
@@ -175,16 +178,17 @@ void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long b
             buffer[n-i-1] = temp;
         }
 
-        if(write(outputFileDesc, buffer, n)==-1) {
+        if(write(outputFileDesc,buffer,n)==-1) {
             printOnConsole("Error while writing to the file");
             _exit(1);
         }
         // update the index value 
         index += n;
+        progress += n;
 
-        int totalProgress = (index*100)/fileSize;
+        int totalProgress = (progress*100)/fileSize;
         progressBar(totalProgress);
-        usleep(1000);
+        usleep(sleepValue);
     }
     free(buffer);
 }
@@ -215,8 +219,9 @@ int createOuputFile(const char *directoryName, const char *filepath, long long f
 void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
     // we need to move the pointer to the end
     off_t offset = filesize;
-    int index = filesize;
+    off_t index = filesize;
     int blocksize = 5;
+    off_t progress = 0;
 
     // allocating in the heap so that there won't be any stack overflow 
     char *buffer = (char*)malloc(blocksize);
@@ -249,6 +254,10 @@ void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
             _exit(1);
         };
         index -= n;
+        progress += n;
+        int totalProgress = (progress*100)/filesize;
+        progressBar(totalProgress);
+        usleep(sleepValue);
     }
     free(buffer);
 }

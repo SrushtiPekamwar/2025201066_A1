@@ -1,2 +1,131 @@
-surS ithakePrawm sI
-niodht ga sinissnemgt
+[reff1-i-nt = ]
+;pme     
+}        fi   tirw(tuo(eiFtupseDelfub,cn,ref1-==) 
+{ )          nirp oCnOtelosnrrE"(hw row elinitireht gelif  
+;)"          ixe_ ;)1(t    
+}       
+;     xednin =-    
+;     rgorp+ sse
+;n =     ni   tot torPlassergp( = ergor01*ssif/)0zisel  
+;e     gorp Bsserot(rarPlatsergo 
+;)s     lsu  1(pee00000
+;)00     ff   -n[re ]1-imet =  
+;p       
+}      w(fi (etiruptuoeliFt,cseDeffub=)n,r )1-=   
+{     p    OtnirsnoCn"(elororrElihw irw e gnitf eht)"eli   
+;     _    (tixe 
+;)1     
+;}       ni   - xed
+;n =     rp   sergo =+ s  
+;n      tni latotrgorP= sseorp( sserg)001*elif/;ezis    
+p    ergorraBssatot(gorPl)sser   
+;     eelsu001(p00000  
+;)     reff -i-n[ = ]1;pmet    
+}        
+i    irw(fuo(etFtupteDeliub,cs,reff-==)n
+{ )1          irp  CnOtnlosnorE"(ew ror elihitirwht gnlif e
+;)"e          xe_  )1(ti   
+;       
+;}     edni  =- x  
+;n     gorp  sser;n =+    
+i    ot tnrPlatsergo( = srgorp1*ssef/)00iseli 
+;ez     orp  ssergt(raBPlatoergor
+;)ss     su   (peel00001;)000    
+f    n[ref]1-i-et =  
+;pm      
+}       (fi  etirwptuo(liFtucseDeffub,)n,re)1-==  
+{           tnirpnoCnO(elosorrE"ihw rrw elgniti eht "elif  
+;)          tixe_
+;)1(     ;}       
+i     xedn;n =-    
+p    ergor=+ ss 
+;n      tni  atot gorPl sserrp( =sergo001*slif/)ezise   
+;     rgorpaBssetot(rorPlasserg  
+;)     elsu 01(pe00000 
+;)0     eff  i-n[r= ]1-pmet    
+;        
+}     rw(fio(etituptuDeliFb,csereffu==)n,{ )1-    
+     rp   nOtniosnoCE"(el rorrelihwtirw t gniif eh;)"el    
+     e_   1(tix  
+;)      
+;}      dni  =- xe 
+;n      orp  ssergn =+    
+;     t tniPlatoergor = ssgorp(*sser/)001selif
+;ezi     rp   sergo(raBslatotrgorP;)sse    
+u    peels0001()0000   
+;     [reff1-i-nt = ]
+;pme     
+}        fi   tirw(tuo(eiFtupseDelfub,cn,ref1-==) 
+{ )          nirp oCnOtelosnrrE"(hw row elinitireht gelif  
+;)"          ixe_ ;)1(t    
+}       
+;     xednin =-    
+;     rgorp+ sse
+;n =     ni   tot torPlassergp( = ergor01*ssif/)0zisel  
+;e     gorp Bsserot(rarPlatsergo 
+;)s     lsu  1(pee00000f;)00n[ref]1-i-et =  
+;pm      
+}       (fi  etirwptuo(liFtucseDeffub,)n,re)1-==  
+{           tnirpnoCnO(elosorrE"ihw rrw elgniti eht "elif  
+;)          tixe_
+;)1(     ;}       
+i     xedn;n =-    
+p    ergor=+ ss 
+;n      tni  atot gorPl sserrp( =sergo001*slif/)ezise   
+;     rgorpaBssetot(rorPlasserg  
+;)     elsu 01(pe00000 
+;)0     eff  i-n[r= ]1-pmet    
+;        
+}     rw(fio(etituptuDeliFb,csereffu==)n,{ )1-    
+     rp   nOtniosnoCE"(el rorrelihwtirw t gniif eh;)"el    
+     e_   1(tix  
+;)      
+;}      dni  =- xe 
+;n      orp  ssergn =+    
+;     t tniPlatoergor = ssgorp(*sser/)001selif
+;ezi     rp   sergo(raBslatotrgorP;)sse    
+u    peels0001()0000  
+
+;     reff -i-n[ = ]1;pmet    
+}        
+i    irw(fuo(etFtupteDeliub,cs,reff-==)n
+{ )1          irp  CnOtnlosnorE"(ew ror elihitirwht gnlif e
+;)"e          xe_  )1(ti   
+;       
+;}     edni  =- x  
+;n     gorp  sser;n =+    
+i    ot tnrPlatsergo( = srgorp1*ssef/)00iseli 
+;ez     orp  ssergt(raBPlatoergor
+;)ss     su   (peel00001;)000    
+f    n[ref]1-i-et =  
+;pm      
+}       (fi  etirwptuo(liFtucseDeffub,)n,re)1-==  
+{           tnirpnoCnO(elosorrE"ihw rrw elgniti eht "elif  
+;)          tixe_
+;)1(     ;}       
+i     xedn;n =-    
+p    ergor=+ ss 
+;n      tni  atot gorPl sserrp( =sergo001*slif/)ezise   
+;     rgorpaBssetot(rorPlasserg  
+;)     elsu 01(pe00000 
+;)0     eff  i-n[r= ]1-pmet    
+;        
+}     rw(fio(etituptuDeliFb,csereffu==)n,{ )1-    
+     rp   nOtniosnoCE"(el rorrelihwtirw t gniif eh;)"el    
+     e_   1(tix  
+;)      
+;}      dni  =- xe 
+;n      orp  ssergn =+    
+;     t tniPlatoergor = ssgorp(*sser/)001selif
+;ezi     rp   sergo(raBslatotrgorP;)sse    
+u    peels0001()0000reff;-i-n[ = ]1;pmet    
+}        
+i    irw(fuo(etFtupteDeliub,cs,reff-==)n
+{ )1          irp  CnOtnlosnorE"(ew ror elihitirwht gnlif e
+;)"e          xe_  )1(ti   
+;       
+;}     edni  =- x  
+;n     gorp  sser;n =+    
+i    ot tnrPlatsergo( = srgorp1*ssef/)00iseli 
+;ez     orp  ssergt(raBPlatoergor
+;)ss     su   (peel00001;)000
