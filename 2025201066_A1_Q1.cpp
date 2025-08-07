@@ -84,14 +84,20 @@ void printInteger(long long number) {
 void fileValidation(int fileDesc) {
     if (fileDesc == -1) {
         if (errno==ENOENT) {
-            printOnConsole(strerror(errno));
-            printOnConsole("\n");
+            printOnConsole("No such file exists\n");
             _exit(1);
         }
-        if(errno==EACCES) {
-            printOnConsole("You don't have required permissions to access this file\n");
-            _exit(1);
-        }
+        // use uid for checking the required permissions 
+        int userId = getuid();
+        struct stat fileStats;
+        fstat(fileDesc, &fileStats);
+        // file ka userid 
+        // then we need to check whether it has read and write permissions 
+
+        // if(errno==EACCES) {
+        //     printOnConsole("You don't have required permissions to access this file\n");
+        //     _exit(1);
+        // }
     }
 }
 
@@ -113,7 +119,8 @@ void createDirectory(const char *directoryName) {
 void progressBar(int totalProgress) {
     printOnConsole("\r"); 
     for (int i=0;i<50;++i) {
-        if (i<(totalProgress*50)/100) {
+        int percentage = (totalProgress*50)/100;
+        if (i<percentage) {
             printOnConsole("#");
         } else {
             printOnConsole("=");
