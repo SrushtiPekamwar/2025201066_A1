@@ -1,3 +1,13 @@
+// changes in stroll
+// don't use snprintf
+// change the progress bar 
+// check the file permissions before checking whether the input file has those errors
+// give correct permissions to the file 
+// max block size will be 8MB
+// check the uid and file modes
+// use byte read for block reversal
+// mmap : read research paper 
+
 #include<stdio.h>
 #include<unistd.h> // contains read, write, close sys calls
 #include<cstring>
@@ -48,7 +58,7 @@ long long isBlockSizeValid(const char *c) {
 
     // to avoid overflow 
     if(blocksize>maxBlockSize) {
-        printOnConsole("Block size overflow\n");
+        printOnConsole("Overflow: Block size very large\n");
         _exit(1);
     }
 
@@ -87,17 +97,6 @@ void fileValidation(int fileDesc) {
             printOnConsole("No such file exists\n");
             _exit(1);
         }
-        // use uid for checking the required permissions 
-        int userId = getuid();
-        struct stat fileStats;
-        fstat(fileDesc, &fileStats);
-        // file ka userid 
-        // then we need to check whether it has read and write permissions 
-
-        // if(errno==EACCES) {
-        //     printOnConsole("You don't have required permissions to access this file\n");
-        //     _exit(1);
-        // }
     }
 }
 
@@ -116,18 +115,11 @@ void createDirectory(const char *directoryName) {
     }
 }
 
-void progressBar(int totalProgress) {
+void progressBar(float totalProgress) {
     printOnConsole("\r"); 
-    for (int i=0;i<50;++i) {
-        int percentage = (totalProgress*50)/100;
-        if (i<percentage) {
-            printOnConsole("#");
-        } else {
-            printOnConsole("=");
-        }
-    }
+    printOnConsole("Progress: ");
     char buffer[16];
-    snprintf(buffer, sizeof(buffer), "] %d%%", totalProgress);
+    snprintf(buffer, sizeof(buffer), "%.2f%%", totalProgress);
     printOnConsole(buffer);
     fflush(stdout);
 }
@@ -152,10 +144,12 @@ void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long b
 
         if(lseek(inputFileDesc,currOffset,SEEK_SET)==-1) {
             printOnConsole("Error while seeking the input file");
+            delete[] buffer;
             _exit(1);
         }
         if(read(inputFileDesc,buffer,blocksRead)==-1) {
-            printOnConsole("Error while reading the input ile");
+            printOnConsole("Error while reading the input file");
+            delete[] buffer;
             _exit(1);
         }
         // Reversing the contents of the current block
@@ -166,16 +160,18 @@ void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long b
         }
         if(write(outputFileDesc,buffer,blocksRead)==-1) {
             printOnConsole("Error while writing to the ouptut file");
+            delete[] buffer;
             _exit(1);
         }
         // Current offset value updation
         currOffset += blocksRead;
         progress += blocksRead;
 
-        int totalProgress = (progress*100)/fileSize;
+        float totalProgress = (progress*100.0)/fileSize;
         progressBar(totalProgress);
+        usleep(sleepValue);
     }
-    free(buffer);
+    delete[] buffer;
 }
 
 int createOuputFile(const char *directoryName, const char *filepath, long long flag) {
@@ -200,7 +196,7 @@ void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
     // we need to move the pointer to the end
     off_t offset = filesize;
     off_t index = filesize;
-    int blocksize = 5;
+    int blocksize = 1024;
     off_t progress = 0;
 
     // allocating in the heap so that there won't be any stack overflow 
@@ -217,11 +213,13 @@ void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
         }
         if(lseek(inputFileDesc,index-n,SEEK_SET)==-1) {
             printOnConsole("Error while seeking the input file");
+            delete[] buffer;
             _exit(1);
         }
 
         if(read(inputFileDesc,buffer,n)==-1) {
             printOnConsole("Error while reading the input file");
+            delete[] buffer;
             _exit(1);
         }
         // reversing the single buffer block
@@ -232,6 +230,7 @@ void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
         }
         if(write(outputFileDesc,buffer,n)==-1) {
             printOnConsole("Error while writing to the output file");
+            delete[] buffer;
             _exit(1);
         };
         progress+=n;
@@ -239,7 +238,7 @@ void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
         int totalProgress = (progress*100)/filesize;
         progressBar(totalProgress);
     }
-    free(buffer);
+    delete[] buffer;
 }
 
 // reverse the file when start and end index are given
@@ -284,11 +283,11 @@ int main(int argc, char *argv[]) {
             // open the file in read only mode
             int originalFileDesc = open(filepath, O_RDONLY); 
             if(originalFileDesc==-1) {
-                printOnConsole("Erorr while opening the input file");
+                fileValidation(originalFileDesc);
+                printOnConsole("Error while opening the input file");
                 _exit(1);
             }
 
-            fileValidation(originalFileDesc);
             const char *directName = "Assignment1";
             createDirectory(directName);
 
@@ -332,11 +331,11 @@ int main(int argc, char *argv[]) {
             const char* filepath = argv[1];
             int originalFileDesc = open(filepath, O_RDONLY); 
             if(originalFileDesc==-1) {
+                fileValidation(originalFileDesc);
                 printOnConsole("Error while opening the input file");
                 _exit(1);
             }
 
-            fileValidation(originalFileDesc);
             const char * directName = "Assignment1";
             createDirectory(directName);
 
