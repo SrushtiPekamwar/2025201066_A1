@@ -1,131 +1,397 @@
-[reff1-i-nt = ]
-;pme     
-}        fi   tirw(tuo(eiFtupseDelfub,cn,ref1-==) 
-{ )          nirp oCnOtelosnrrE"(hw row elinitireht gelif  
-;)"          ixe_ ;)1(t    
-}       
-;     xednin =-    
-;     rgorp+ sse
-;n =     ni   tot torPlassergp( = ergor01*ssif/)0zisel  
-;e     gorp Bsserot(rarPlatsergo 
-;)s     lsu  1(pee00000
-;)00     ff   -n[re ]1-imet =  
-;p       
-}      w(fi (etiruptuoeliFt,cseDeffub=)n,r )1-=   
-{     p    OtnirsnoCn"(elororrElihw irw e gnitf eht)"eli   
-;     _    (tixe 
-;)1     
-;}       ni   - xed
-;n =     rp   sergo =+ s  
-;n      tni latotrgorP= sseorp( sserg)001*elif/;ezis    
-p    ergorraBssatot(gorPl)sser   
-;     eelsu001(p00000  
-;)     reff -i-n[ = ]1;pmet    
-}        
-i    irw(fuo(etFtupteDeliub,cs,reff-==)n
-{ )1          irp  CnOtnlosnorE"(ew ror elihitirwht gnlif e
-;)"e          xe_  )1(ti   
-;       
-;}     edni  =- x  
-;n     gorp  sser;n =+    
-i    ot tnrPlatsergo( = srgorp1*ssef/)00iseli 
-;ez     orp  ssergt(raBPlatoergor
-;)ss     su   (peel00001;)000    
-f    n[ref]1-i-et =  
-;pm      
-}       (fi  etirwptuo(liFtucseDeffub,)n,re)1-==  
-{           tnirpnoCnO(elosorrE"ihw rrw elgniti eht "elif  
-;)          tixe_
-;)1(     ;}       
-i     xedn;n =-    
-p    ergor=+ ss 
-;n      tni  atot gorPl sserrp( =sergo001*slif/)ezise   
-;     rgorpaBssetot(rorPlasserg  
-;)     elsu 01(pe00000 
-;)0     eff  i-n[r= ]1-pmet    
-;        
-}     rw(fio(etituptuDeliFb,csereffu==)n,{ )1-    
-     rp   nOtniosnoCE"(el rorrelihwtirw t gniif eh;)"el    
-     e_   1(tix  
-;)      
-;}      dni  =- xe 
-;n      orp  ssergn =+    
-;     t tniPlatoergor = ssgorp(*sser/)001selif
-;ezi     rp   sergo(raBslatotrgorP;)sse    
-u    peels0001()0000   
-;     [reff1-i-nt = ]
-;pme     
-}        fi   tirw(tuo(eiFtupseDelfub,cn,ref1-==) 
-{ )          nirp oCnOtelosnrrE"(hw row elinitireht gelif  
-;)"          ixe_ ;)1(t    
-}       
-;     xednin =-    
-;     rgorp+ sse
-;n =     ni   tot torPlassergp( = ergor01*ssif/)0zisel  
-;e     gorp Bsserot(rarPlatsergo 
-;)s     lsu  1(pee00000f;)00n[ref]1-i-et =  
-;pm      
-}       (fi  etirwptuo(liFtucseDeffub,)n,re)1-==  
-{           tnirpnoCnO(elosorrE"ihw rrw elgniti eht "elif  
-;)          tixe_
-;)1(     ;}       
-i     xedn;n =-    
-p    ergor=+ ss 
-;n      tni  atot gorPl sserrp( =sergo001*slif/)ezise   
-;     rgorpaBssetot(rorPlasserg  
-;)     elsu 01(pe00000 
-;)0     eff  i-n[r= ]1-pmet    
-;        
-}     rw(fio(etituptuDeliFb,csereffu==)n,{ )1-    
-     rp   nOtniosnoCE"(el rorrelihwtirw t gniif eh;)"el    
-     e_   1(tix  
-;)      
-;}      dni  =- xe 
-;n      orp  ssergn =+    
-;     t tniPlatoergor = ssgorp(*sser/)001selif
-;ezi     rp   sergo(raBslatotrgorP;)sse    
-u    peels0001()0000  
+ulcni#dts<ed
+>h.oiulcni#inu<ed>h.dtsoc // sniatn,daer etirw solc , sys e
+sllaculcni#tsc<ed
+>gnirulcni#tsc<ed
+>bildulcni#ncf<ed >h.ltnoc // sniats nepolac sycni#
+le<edulh.onrrcni#
+>l<edul.negbi // >hab rofemanestcnuf i#
+noiedulcns/sys<>h.tatlcni#
+ys<eduepyt/s/ >h.sedom /ni#
+t_<edulcertsoii
 
-;     reff -i-n[ = ]1;pmet    
-}        
-i    irw(fuo(etFtupteDeliub,cs,reff-==)n
-{ )1          irp  CnOtnlosnorE"(ew ror elihitirwht gnlif e
-;)"e          xe_  )1(ti   
-;       
-;}     edni  =- x  
-;n     gorp  sser;n =+    
-i    ot tnrPlatsergo( = srgorp1*ssef/)00iseli 
-;ez     orp  ssergt(raBPlatoergor
-;)ss     su   (peel00001;)000    
-f    n[ref]1-i-et =  
-;pm      
-}       (fi  etirwptuo(liFtucseDeffub,)n,re)1-==  
-{           tnirpnoCnO(elosorrE"ihw rrw elgniti eht "elif  
-;)          tixe_
-;)1(     ;}       
-i     xedn;n =-    
-p    ergor=+ ss 
-;n      tni  atot gorPl sserrp( =sergo001*slif/)ezise   
-;     rgorpaBssetot(rorPlasserg  
-;)     elsu 01(pe00000 
-;)0     eff  i-n[r= ]1-pmet    
-;        
-}     rw(fio(etituptuDeliFb,csereffu==)n,{ )1-    
-     rp   nOtniosnoCE"(el rorrelihwtirw t gniif eh;)"el    
-     e_   1(tix  
+>maels tnulaVpe01 = e
+
+;000nuf // noitcirp ottno tn eht olosnociht ,ej si sil tsueht ekpparw  fo reftnirpdiov
+ tnirp snoCnOoc(elohc tsnsm* ra 
+{ )g //   _ezisst si tpyt ehcihw eu si hsa desruter epyt nam ot sys ynsllac     
+ _eziss = e t(etirw,gsm,1nelrts))gsm(   
+
+;=e(fi { )1-=     
+noc   ahc tsrre* r" = rodeliaFrp ot ot tnic eht elosno 
+;"n\      ht // srif e gra tirw fo si etif ehtsed elrehw c - 1 etuodts2 dna ts si  
+rred      etirw rre,2(rts,rore(nel;))ror     
+xe_   ;)1(ti}    
+//
+
+}
+tcnuf ot noitnirp u eht o egas eht fnammociov
+ dnirp dammoCtgasUdn
+{ )(erp    CnOtnielosno----"(------------------------moC---u dnam--egas------------------------\----- 
+;)"nirp   oCnOtn(elosnkcolB"r esiwasreve     l.a/. :i< tuof_tupn0 >elicolb< ezis_k;)"n\>p    
+nOtnirlosnoCluF"(eelif lrever    las/. :   tuo.atupni<>elif_)"n\1     
+;OtnirposnoCnaP"(el laitr egnarsrever. : latuo.a/upni< elif_ts< 2 >i_trat >xedni_dne<\>xedn 
+;)"nirp   oCnOtn(elosn-----"------------------------------------------------------------------n\----
+;)"n\ //
+
+}itcnuf ot no kcehcehtehw eht r nevig kcolbi ezisilav sn ro dol
+ tonol gnlBsi gziSkcodilaVetsnoc( rahc 
+{ )c*ol    nol gnBxam giSkcolL = ezM_GNOL  
+;XArahc  pdne */  ;rtpdne /liw rtniop lt ot trif ehvni tsc dilatcarahtfa reeht reebmun    
+.r gnol b gnoliskcols = ezllotrte& ,c(,rtpdn
+;)01 fi    dne*( =! rtp)'0\'    
+{ p     nOtnirlosnoCvnI"(eb dilas kcolb ,ezis kcolum ezi eb tstni nan\rege  
+;)"      (tixe_  
+;)1 
+
+}   //    kcolbm eziseb tsutisop av evi  
+eulb(fi  iskcol)0=<ez   
+{ p     nOtnirlosnoColB"(ezis kcuohs e eb dlitisop)"n\ev    
+;e_    )1(tix    
+;   
+
+}ot // diova frevo  
+ wol(fi   skcolbam>ezikcolBx )eziS    
+{rp    CnOtnielosnocolB"(ezis kfrevo "n\wol   
+;)_     1(tixe   
+;)  
+
+} uter  olb nreziskc/
+
+}
+;cnuf /t noitcehc otehw kht rehulav ef fo esi galdilav i tni
+VgalFsc(dilac tsnoc* rah  
+{ )rahc  pdne *  
+;rtgnol   gnol = galfotrts  ,c(lltpdne&)01 ,r   
+
+;hC // fi kcetupni  a si  dilavegetni    
+re*( fi rtpdn0\' =! 
+{ )'      tnirp snoCnOF"(eloav galum eul eb tstni nae rege rehtio 1 ,0\n\2 r 
+;)"n      tnirp nammoCegasUd  
+;)(      (tixe_  
+;)1 
+
+}   //    kcehCalf fii si golla nar dew  
+egn( fi  ! galf&& 0 = galf & 1 =!galf &)2 =!    
+{ p     nOtnirlosnoCvnI"(ef dilaav galv ,eulf dilav sgal seula,0 eraro ,1 n\n\2   
+;)"      Ctnirpdnammo(egasU   
+;)_     1(tixe   
+;)   
+} ruter tni( n;galf)//
+
+}
+tcnuf ot noitnirp i eht regetnc yb strevnoti gni otni gnirtsdiov
+ tnirp egetnIgnol(r gnol rebmun  
+{ )rahc  effub ;]46[r    
+ nirpnsfub(ftis,refb(foez)reffudll%",bmun," 
+;)reirp   oCnOtn(elosnreffub
+
+}
+;)ehc //hw skc rehtee elif stsixsti ror sah eriuqemrep dnoissiiov
+ selif dadilaVi(noitlif tn)cseDe   
+{ f( fi seDeli- == c 
+{ )1      e( fi ==onrrTNEONE  
+{ )      rp    CnOtnielosnorerts(re(ror;))onr     
+      tnirp snoCnO\"(elo 
+;)"n      _     1(tixe   
+;)}          
+(fi   =onrreECCAE= 
+{ )S      p     nOtnirlosnoCuoY"(et'nod  evah riuqerrep deoissim ot snssecca siht n\elif  
+;)"      e_    )1(tix    
+;
+}    
+}     //
+
+}tceridrc yronoitae htiw  ,daer etirwxe dna etucesimrep snois diov
+etaerctceriDoc(yrohc tsnid* rarotcer)emaNy   
+{ curts tats tstats     
+;ehC // fi kcid ehtrotcersixe y   
+sts( fi id(tatrotcer,emaNystats& )0==)    
+{rp    CnOtnielosnocerid(aNyrot 
+;)em      tnirp snoCnO "(elodaerlasixe y)"n\st    
+;er    
+;nrut
+}    //    taerC erid e yrotcig dnaesu evmrep rnoissir fo sw ,daea etirexe dn 
+etucsle     
+{ e      (ridkmtceridmaNyro070 ,e  
+;)0      OtnirposnoCniD"(elrotcerssA' ynemngirc '1t detaeseccusyllufs
+;)"n\
+}     //
+
+}itadpuorp nosssergv
+rab rp diossergoni(raBatot trgorPl{ )ssep    
+nOtnirlosnoC30\"(e)"K2[3 
+   ;irp   oCnOtn(elosn[330\" ;)"G0f    
+ni( ro;0=i t+;05<i
+{ )i+      ( fi  tot(<igorPla5*sser001/)0  
+{ )      rp    CnOtnielosno;)"#"(     
+e }   
+{ esl            OtnirposnoCn"="(el   
+;)}     }    
+c    
+ub rah1[reff  
+;]6rpns  b(ftni,reffuoezis ffub(f" ,)re%%d% ]tot ,"gorPla;)sserp    
+nOtnirlosnoCffub(e 
+;)relff   ts(hsu;)tuod//
+
+}
+tcnuf ot noiofrep olb mrsiw kcever ev
+lasrep dioBmrofriwkcoleveResi(lasrpni tneliFtu ,cseDuo tniiFtuptcseDelgnol , gnol Skcolbo ,ezif t_ffziSeli 
+{ )e //   acollai gnit eht ns paehtaht oereht t'now na eb cats yrevo k
+ wolffo    rp t_fssergo
+;0 = hc    ub *ra= reffrahc( llam)*olb(coeziSkc   
+;)t_ffo xedni 
+;0 = fi    effub(LUN==r 
+{ )L      tnirp snoCnOM"(elo yromeacollaw noitsnu sasseccu"n\luf   
+;)_     1(tixe   
+;)  
+
+} lihw  dni( elif<xe)eziSe   
+{ s     t_ezisb = n iSkcol 
+
+;ez      ht // liw siosla lldnah nehw el eht lb tsais kco si ezetaergnaht rf eht is eli  
+ ez      ni( filb+xedziSkcoelif>e )eziS    
+{       = n  iSelifdni-ez  
+;xe         
+
+}i     eesl(fupni(kDeliFtni,cseES,xedTES_KE)1-==)   
+{       irp   oCnOtn(elosnrorrE"elihw ikees eht gn"elif    
+;)      xe_   ;)1(ti     
+ 
+}         er(fi pni(daeliFtub,cseD,reffu1-==)n  
+{ )      rp    CnOtnielosnoorrE"(lihw rdaer eht gnielif e  
+;)"      e_    )1(tix    
+;
+}          R //  isreveeht gnetnoc fo stnc eht tnerrukcolb      
+rof   eziss(0=i t_2/n<i; )i++;    
+{      rahc   pmet ffub =;]i[re     
+      effub = ]i[reffub -i-n[r  
+;]1      ub    n[reff ]1-i-pmet =    
+;
+}         
+(fi   (etirwtuptuoeDeliFfub,cs)n,ref )1-==    
+{      nirp  noCnOt"(elos rorrE elihwnitirwt ot glif eh 
+;)"e      _     1(tixe   
+;)}          
+ //    xednI eulavitadpu   
+noi     + xedn 
+;n =      rgorp =+ sse 
+
+;n       t tni rPlatossergorp( = ssergo/)001*iSelif  
+;ez      ergorp(raBssPlatotsergor  
+;)s      peelsupeels()eulaV    
+;    
+}b(eerf)reffu/
+
+}
+;elif /taerc iw noiaer ht dna d etirwsimrep snoisc tni
+OetaeriFtupunoc(elahc tsrid* ryrotce ,emaN tsnoc* rahcapelifol ,htnol gngalf g  
+{ )rahc  ypoc* htaPfOrts = if(pudhtapel   
+;)tsnoc *rahc uptuo NeliFt = emaanesabpoc(emtaPfOy   ;)hsab //eman eht fo elif e    
+ erP //f erapuo llup tupt" :htangissA/1tnem<_galf_tupnin_elif
+">emahc    luf ra[htaPl;]4201s    
+tnirpnlluf(f ,htaPfoezisPlluf( ,)htal%/s%""s%_dlerid ,Nyrotclf,ematuo,galiFtup)emaNe   
+
+;_O // :TAERCetaercelif sti fi nseod ixe t'_O ,tsLGNORWtirw:Yylno eO dna CNURT_raelc: eht snetnoct fo tlif eh    
+edf tniepo = lluf(n ,htaPAERC_O_O | TYLNORWT_O |  ,CNUR;)0060er // dna daetirw imrep snoissi    
+==df(f
+{ )1-      nirp  noCnOt"(elos rorrE elihwitaerceht gnuptuo elif t  
+;)"      (tixe_  
+;)1  
+}  uter  ;df nr//
+
+}
+ elif ver ott esreohw ehlif eliov
+ eever dehTesri(eliFpni tneliFtu ,cseDuo tniiFtuptcseDel_ffo ,elif t )ezis    
+{ ew //t deenevom op eht retnioht ot 
+dne efo    fo t_f= tesfselif  
+;eziffo   dni t_f = xeziseli   
+;eb tni iskcol5 = ez    
+; t_ffoergorp0 = ss   
+
+;la // itacol ni gneh eht os pat tahtw erehb t'no yna e kcatslfrevo  
+ worahc  ffub* ( = re)*rahccollamkcolb(;)ezisi    
+ffub(fUN==re
+{ )LL      nirp  noCnOt"(elosyromeMcolla  noitanu sawseccusn\lufs  
+;)"      (tixe_  
+;)1  
+}     
+  elihw xedni(
+{ )0>      ezis  = n t_kcolb 
+;ezis      i(fi  b-xedniskcol)0=<ez   
+{       = n   xedni     
+;
+}          l(fi  i(keesiFtupncseDeledni ,S ,n-xES_KEE1-==)T  
+{ )      rp    CnOtnielosnoorrE"(lihw rkees eht gnielif e  
+;)"      e_    )1(tix    
+;
+}         
+(fi   i(daeriFtupncseDelffub ,)n ,re )1-==    
+{      nirp  noCnOt"(elos rorrE elihwnidaer eht g)"elif    
+;      ixe_  
+;)1(t        
+}        ni(rof;0=i t;2/n<i{ )i++     
+       rahc = pmeteffub 
+;]i[r            reffub = ]i[reffub1-i-n[   
+;]      fub   -n[ref= ]1-i;pmet      
+ 
+}         rw(fi uo(etiiFtuptcseDeleffub,==)n,r
+{ )1-            OtnirposnoCnrE"(elhw rorrw eli gnitiif eht
+;)"el            (tixe_  
+;)1         
+;}i     - xedn 
+;n =      rgorp =+ sse  
+;n       ot tniorPlat ssergorp( =*ssergf/)001ziseli   
+;ep     sergort(raBsrPlatossergo   
+;)u     (peelsVpeels;)eula}    
+f    
+ub(eer;)reff//
+
+}
+rever eht es elif s nehwa tratdne dnxedni g era 
+
+neviam tnitni(ni,cgra  rahc [vgra* 
+{ )](fi   3<cgra  
+{ )      OtnirposnoCnuN"(elo rebmugra f stnemef eraht rewpxe na\detce 
+;)"n      tnirp nammoCegasUd  
+;)(      nruter  
+;1  
+
+}  sle   a(fi e)5>cgr   
+{ p     nOtnirlosnoCmuN"(efo rebmugra a stneerg ert retaxe nahdetcep
+;)"n\      nirp  ammoCtgasUdn 
+;)(e      ruter  
+;1 n
+
+}   //     galf tni sib rege ew tuts tegt gnirrf epyeht moosnoc   
+ elgnol   gnol = galfalFsi dilaVg[vgra(
+
+;)]2//    ------------------------------ galf-u si 0ot deslb od iw-kcover es-lasre------------------------   
+--lf(fi )0==ga   
+{ i     cgra(f{ )4=!     
+      tnirp snoCnOW"(elon gnor rebmugra fostnemu
+;)"n\            Ctnirpdnammo(egasU   
+;)      ter   ;1 nru     
+ 
+}          esle     
+{      . //  tuo.a/upni< elif_tb< 0 >s_kcol 
+>ezi      c     c tsnof *rahtapelira = h;]1[vg    
+
+      rahc  pdne*   
+;rt      ol    nol gncolb g ezisklBsi =ziSkcodilaVe[vgra(
+
+;)]3            eht //eporp fo ytrlorts t si lti tah lliw o daerit ylneht lltigid  era sneserp   
+ t       //    ti fi321 sieht sdw ti ner llilit da 321 lht dnadne neiw rtpton llruter    
+ n      (fi   skcolb-==ezi 
+{ )1            ter   ;1 nru     
+        
+
+}       //     nepo if eht ni elo daer 
+ yln      i     iro tnFlanigseDelipo = clif(ne,htapeODR_O  ;)YLN     
+      ro(fi lanigieDeliF1-==cs  
+{ )            nirp  noCnOt"(elos rrorE elihwninepo eht g tupni)"elif    
+;            (tixe_  
+;)1      
+}         
+      av // itadileht gn elif      
+      Velif tadilaro(noilanigieDeliF
+
+;)cs            rid //yrotcetaerc  
+ noi      c     c tsno * rahtcerid= emaNissA" tnemng  
+;"1      rc    iDetaerotcererid(yemaNtc  
+
+;)      //    rcsed  rotpiuo roff tupt  
+eli      ni    ptuo teliFtu= cseDtaerc tupuOed(eliFNtceriif,emahtapelgnol(,)gnol ;)galf     
+      uo(fi iFtuptcseDel )1-==    
+{            OtnirposnoCnrE"(elhw rorrc elignitaeo eht  tuptu)"elif    
+;            (esolcnigiroeliFla;)cseD     
+      _     1(tixe   
 ;)      
-;}      dni  =- xe 
-;n      orp  ssergn =+    
-;     t tniPlatoergor = ssgorp(*sser/)001selif
-;ezi     rp   sergo(raBslatotrgorP;)sse    
-u    peels0001()0000reff;-i-n[ = ]1;pmet    
-}        
-i    irw(fuo(etFtupteDeliub,cs,reff-==)n
-{ )1          irp  CnOtnlosnorE"(ew ror elihitirwht gnlif e
-;)"e          xe_  )1(ti   
-;       
-;}     edni  =- x  
-;n     gorp  sser;n =+    
-i    ot tnrPlatsergo( = srgorp1*ssef/)00iseli 
-;ez     orp  ssergt(raBPlatoergor
-;)ss     su   (peel00001;)000
+
+}               tcurts tats tSelif  
+;ta      sf    ro(tatlanigieDeliFif&,cstatSel   
+;)       //    t_ffo 46 sia stibneh dnnac ecerots  llit axe 8~setyb      
+      t_ffo igiro liFlan eziSeelif =s.tatSezis_t   
+ ;      (fi   nigiroeliFla0<eziS  
+{ )            nirp  noCnOt"(elos rorrE elihwluclac gnitaif ehtzis el 
+;)"e            olc   iro(esFlanigseDeli  
+;)c            solc  ptuo(eeliFtu;)cseD     
+      _     1(tixe   
+;)       
+}         i     colb(f>ezisknigiroeliFla )eziS    
+{            OtnirposnoCnaW"(el:gninrkcolB  ezis erg sit retaht nahelif e\ezis  
+;)"n      }        
+
+        //   olb oDsiw kcever e
+ lasr            rofrepkcolBmeResiwlasrevigiro(liFlan,cseDeuptuo DeliFtb ,cseiskcolro ,ezlanigiiSeliF
+
+;)ez            olc //eht es elif      
+      esolc igiro(liFlan)cseDe    
+;      solc  ptuo(eeliFtu;)cseD     
+ 
+}   
+
+}   //     galf u si 1ot desoc od etelpm elif srever   
+la esle alf(fi )1==g    
+{fi    !cgra(
+{ )3=            OtnirposnoCnrW"(elun gnoo rebmugra f\stnem 
+;)"n      p     oCtnirUdnamm)(egas    
+;      uter  
+;1 nr        
+}        { esle     
+      /. //  tuo.atupni<>elif_   
+1       noc   ahc tslif *r htapevgra = 
+;]1[      i     iro tnFlanigseDelipo = clif(ne,htapeODR_O  ;)YLN     
+      ro(fi lanigieDeliF1-==cs  
+{ )            nirp  noCnOt"(elos rorrE elihwninepo eht g tupni)"elif    
+;            (tixe_  
+;)1      
+}                lav //nitadi eht g
+ elif            aVelifitadiliro(noFlanigseDeli 
+
+;)c      /     erid / yrotcitaerc   
+no      noc   ahc tsid * raNtcer" = emngissA"1tnem    
+;      aerc  eriDet(yrotctcerid;)emaN    
+
+      d //  pircseof rotptuo rlif tu    
+e       tni  tuptuoeDeliFc = csOetaeriFtupurid(elmaNtceelif,e(,htapl gnollf)gno 
+;)ga      i     ptuo(feliFtu==cseD
+{ )1-            rp    CnOtnielosnoorrE"(lihw raerc et gnittuo ehif tup
+;)"el            lc    ro(esolanigieDeliF 
+;)cs            xe_   ;)1(ti     
+        
+
+}       //     elif 
+ ezis            tcurts tats tSelif  
+;ta      sf    ro(tatlanigieDeliFif&,cstatSel   
+;)      ffo   iro t_FlanigziSeliif = etatSelis_ts.
+  ;ez            iro(fiFlanigziSeli{ )0<e     
+      p     nOtnirlosnoCrrE"(eihw rolac elitaluceht gn elif )"ezis    
+;            (esolcnigiroeliFla;)cseD     
+      c     o(esolFtuptuseDeli  
+;)c            ixe_  
+;)1(t               
+
+}       //   srever eht e
+ elif            sreveriFehTeiro(elFlanigseDelituo ,cliFtup,cseDeigiro liFlan)eziSe   
+
+;       //    esolcif eht  
+ el      lc    ro(esolanigieDeliF 
+;)cs      c     o(esolFtuptuseDeli  
+;)c          
+}   
+
+}lf // i 2 gadesu sod ot r eht asrevet ni lvig ehnar ne fo eg
+xednile    (fi es==galf 
+{ )2      ra(fi )5=!cg   
+{       irp   oCnOtn(elosngnorW"ebmun a fo rnemugr)"n\st    
+;      nirp  ammoCtgasUdn 
+;)(e      r      nrute   
+;1}         
+ le     
+{ es      /      teg /if ehtemanelgalf ,rats ,edni t dna xne ehtedni d    
+x      s //  i tratc xednb t'naaerg eht retdne naxedni     
+ 
+}    
+}    r    
+ nrute}
+;0

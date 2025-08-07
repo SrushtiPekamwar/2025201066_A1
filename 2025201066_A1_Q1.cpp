@@ -9,7 +9,7 @@
 #include<sys/types.h> // mode_t
 #include<iostream>
 
-int sleepValue = 10000;
+int sleepValue = 1000;
 
 // function to print onto the console, this is just like the wrapper of printf 
 void printOnConsole(const char *msg) {
@@ -89,25 +89,15 @@ void printInteger(long long number) {
 // checks whether file exists or its has required permissions 
 void fileValidation(int fileDesc) {
     if (fileDesc == -1) {
-        if (errno==ENOENT || errno==EACCES) {
+        if (errno==ENOENT) {
             printOnConsole(strerror(errno));
             printOnConsole("\n");
             _exit(1);
         }
-    }
-}
-
-// function to read from the file 
-void readContentsOfFile(int fileDesc) {
-    char *buffer = (char*)malloc(1024);
-    if(buffer==NULL) {
-        printOnConsole("Memory allocation failed\n");
-        _exit(1);
-    }
-
-    ssize_t bytesRead;
-    while ((bytesRead = read(fileDesc, buffer, sizeof(buffer))) > 0) {
-        write(1, buffer, bytesRead);
+        if(errno==EACCES) {
+            printOnConsole("You don't have required permissions to access this file\n");
+            _exit(1);
+        }
     }
 }
 
@@ -129,7 +119,7 @@ void createDirectory(const char *directoryName) {
 
 // updation progresss bar
 void progressBar(int totalProgress) {
-    printOnConsole("\r[");
+    printOnConsole("\r"); 
     for (int i=0;i<50;++i) {
         if (i<(totalProgress*50)/100) {
             printOnConsole("#");
@@ -146,45 +136,43 @@ void progressBar(int totalProgress) {
 // function to perform block wise reversal
 void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long blockSize, off_t fileSize) {
     // allocating in the heap so that there won't be any stack overflow 
-    off_t index = 0;
     off_t progress = 0;
-    char *buffer = (char*)malloc(blockSize);
+    char* buffer = (char*)malloc(blockSize);
+    off_t currOffset = 0;
     if(buffer==NULL) {
         printOnConsole("Memory allocation was unsuccessful\n");
         _exit(1);
     }
 
-    while (index<fileSize) {
-        ssize_t n = blockSize;
+    while (currOffset<fileSize) {
+        ssize_t blocksRead = blockSize;
 
-        // when the last remaining characters are less than the block size then it will just consider the remaining characters
-        // this will also handle when the block size is greater than the file size 
-        if (index+blockSize>fileSize) {
-            n = fileSize-index;
+        // this will also handle when the last block size is greater than the file size 
+        if (currOffset+blockSize>fileSize) {
+            blocksRead = fileSize-currOffset;
         }
 
-        if(lseek(inputFileDesc,index,SEEK_SET)==-1) {
-            printOnConsole("Error while seeking the file");
+        if(lseek(inputFileDesc,currOffset,SEEK_SET)==-1) {
+            printOnConsole("Error while seeking the input file");
             _exit(1);
         }
-        if(read(inputFileDesc,buffer,n)==-1) {
-            printOnConsole("Error while reading the file");
+        if(read(inputFileDesc,buffer,blocksRead)==-1) {
+            printOnConsole("Error while reading the input ile");
             _exit(1);
         }
-        // Reverse the contents of the current block
-        for(ssize_t i=0;i<n/2;++i) {
+        // Reversing the contents of the current block
+        for(ssize_t i=0;i<blocksRead/2;++i) {
             char temp = buffer[i];
-            buffer[i] = buffer[n-i-1];
-            buffer[n-i-1] = temp;
+            buffer[i] = buffer[blocksRead-i-1];
+            buffer[blocksRead-i-1] = temp;
         }
-
-        if(write(outputFileDesc,buffer,n)==-1) {
-            printOnConsole("Error while writing to the file");
+        if(write(outputFileDesc,buffer,blocksRead)==-1) {
+            printOnConsole("Error while writing to the ouptut file");
             _exit(1);
         }
-        // update the index value 
-        index += n;
-        progress += n;
+        // Current offset value updation
+        currOffset += blocksRead;
+        progress += blocksRead;
 
         int totalProgress = (progress*100)/fileSize;
         progressBar(totalProgress);
@@ -195,24 +183,18 @@ void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long b
 
 // file creation with read and write permissions 
 int createOuputFile(const char *directoryName, const char *filepath, long long flag) {
+    // "Assignment1/flag_<input_file_name>"
+    char completePath[1024];
     char *copyOfPath = strdup(filepath);
-
-    // converting flag from long long to string and stores in the buffer
-    char flagString[64]; 
-    snprintf(flagString,sizeof(flagString),"%lld",flag);
-
     const char* outputFileName = basename(copyOfPath);   // base name of the file 
-    // Prepare full output path: "Assignment1/flag_<input_file_name>"
-    char fullPath[1024];
-    snprintf(fullPath, sizeof(fullPath), "%s/%s_%s", directoryName,flagString,outputFileName);
+    snprintf(completePath, sizeof(completePath), "%s/%lld_%s", directoryName,flag,outputFileName);
 
-    // O_CREAT:creates file if it doesn't exist, O_WRONGLY:write only and O_TRUNC:clears the content of the file
-    int fd = open(fullPath, O_CREAT | O_WRONLY | O_TRUNC, 0600); // read and write permissions
-    if(fd==-1) {
+    int outputFileDesc = open(completePath, O_CREAT | O_WRONLY | O_TRUNC, 0600); // read and write permissions
+    if(outputFileDesc==-1) {
         printOnConsole("Error while creating the output file");
         _exit(1);
     }
-    return fd;
+    return outputFileDesc;
 }
 
 // file to reverse the whole file 
@@ -235,13 +217,13 @@ void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
         if(index-blocksize<=0) {
             n = index;
         }
-        if(lseek(inputFileDesc, index-n, SEEK_SET)==-1) {
-            printOnConsole("Error while seeking the file");
+        if(lseek(inputFileDesc,index-n,SEEK_SET)==-1) {
+            printOnConsole("Error while seeking the input file");
             _exit(1);
         }
 
-        if(read(inputFileDesc, buffer, n)==-1) {
-            printOnConsole("Error while reading the file");
+        if(read(inputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while reading the input file");
             _exit(1);
         }
         for(int i=0;i<n/2;++i) {
@@ -250,17 +232,19 @@ void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
             buffer[n-i-1] = temp;
         }
         if(write(outputFileDesc,buffer,n)==-1) {
-            printOnConsole("Error while writing the file");
+            printOnConsole("Error while writing to the output file");
             _exit(1);
         };
+        progress+=n;
         index -= n;
-        progress += n;
         int totalProgress = (progress*100)/filesize;
         progressBar(totalProgress);
         usleep(sleepValue);
     }
     free(buffer);
 }
+
+// reverse the file when start and end index are given
 
 int main(int argc, char *argv[]) {
     if(argc<3) {
@@ -297,32 +281,42 @@ int main(int argc, char *argv[]) {
             if(blocksize==-1) {
                 return 1;
             }
-            // block size is valid and now perform the operation 
-            // else {
-            //     printOnConsole("Flag: ");
-            //     printInteger(flag);
-            //     printOnConsole("\nBlock size: ");
-            //     printInteger(blocksize);
-            //     printOnConsole("\n");
 
             // open the file in read only 
             int originalFileDesc = open(filepath, O_RDONLY); 
+            if(originalFileDesc==-1) {
+                printOnConsole("Erorr while opening the input file");
+                _exit(1);
+            }
 
             // validating the file 
             fileValidation(originalFileDesc);
-            printOnConsole("File opened successfully\n"); 
 
             // directory creation 
-            const char * directName = "Assignment1";
+            const char *directName = "Assignment1";
             createDirectory(directName);
 
             // descriptor for output file
             int outputFileDesc = createOuputFile(directName,filepath,(long long)flag);
+            if(outputFileDesc==-1) {
+                printOnConsole("Error while creating the output file");
+                close(originalFileDesc);
+                _exit(1);
+            }
 
             struct stat fileStat;
             fstat(originalFileDesc,&fileStat);
             // off_t is 64 bits and hence can store till ~8 exa bytes
             off_t originalFileSize = fileStat.st_size; 
+            if(originalFileSize<0) {
+                printOnConsole("Error while calculating the file size");
+                close(originalFileDesc);
+                close(outputFileDesc);
+                _exit(1);
+            }
+            if(blocksize>originalFileSize) {
+                printOnConsole("Warning: Block size is greater than the file size\n");
+            } 
 
             // Do block wise reversal 
             performBlockwiseReversal(originalFileDesc, outputFileDesc, blocksize, originalFileSize);
@@ -344,9 +338,12 @@ int main(int argc, char *argv[]) {
             // ./a.out <input_file> 1
             const char* filepath = argv[1];
             int originalFileDesc = open(filepath, O_RDONLY); 
+            if(originalFileDesc==-1) {
+                printOnConsole("Error while opening the input file");
+                _exit(1);
+            }
             // validating the file 
             fileValidation(originalFileDesc);
-            printOnConsole("File opened successfully\n");
 
             // directory creation
             const char * directName = "Assignment1";
@@ -354,11 +351,22 @@ int main(int argc, char *argv[]) {
 
             // descriptor for output file
             int outputFileDesc = createOuputFile(directName,filepath,(long long)flag);
+            if(outputFileDesc==-1) {
+                printOnConsole("Error while creating the output file");
+                close(originalFileDesc);
+                _exit(1);
+            }
 
             // file size 
             struct stat fileStat;
             fstat(originalFileDesc,&fileStat);
             off_t originalFileSize = fileStat.st_size;  
+            if(originalFileSize<0) {
+                printOnConsole("Error while calculating the file size");
+                close(originalFileDesc);
+                close(outputFileDesc);
+                _exit(1);
+            }
 
             // reverse the file 
             reverseTheFile(originalFileDesc, outputFileDesc, originalFileSize);
