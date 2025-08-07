@@ -24,7 +24,6 @@ void printOnConsole(const char *msg) {
     }
 }
 
-// function to print the usage of the command 
 void printCommandUsage() {
     printOnConsole("-------------------------------Command usage-------------------------------\n");
     printOnConsole("Blockwise reversal     : ./a.out <input_file> 0 <block_size>\n");
@@ -33,17 +32,15 @@ void printCommandUsage() {
     printOnConsole("---------------------------------------------------------------------------\n\n");
 }
 
-// function to check whether the given block size is valid or not 
 long long isBlockSizeValid(const char *c) {
     long long maxBlockSize = LLONG_MAX;
-    char* endptr;  // endptr will point to the first invalid character after the number.
+    char* endptr;  // endptr will point to the first invalid character after the number
     long long blocksize = strtoll(c, &endptr, 10);
     if (*endptr != '\0') {
         printOnConsole("Invalid block size, block size must be an integer\n");
         _exit(1);
     }
 
-    // block size must be positive value
     if(blocksize<=0) {
         printOnConsole("Block size should be positive\n");
         _exit(1);
@@ -58,12 +55,11 @@ long long isBlockSizeValid(const char *c) {
     return blocksize;
 }
 
-// function to check whether the value of flag is valid
 int isFlagValid(const char *c) {
     char* endptr;
     long long flag = strtoll(c, &endptr, 10);
 
-    // Check if input is a valid integer
+    // Check if flag is a valid integer
     if (*endptr != '\0') {
         printOnConsole("Flag value must be an integer either 0, 1 or 2\n\n");
         printCommandUsage();
@@ -79,14 +75,12 @@ int isFlagValid(const char *c) {
     return (int)flag;
 }
 
-// function to print the integers by converting it into string 
 void printInteger(long long number) {
     char buffer[64]; 
     snprintf(buffer,sizeof(buffer),"%lld",number);
     printOnConsole(buffer);
 }
 
-// checks whether file exists or its has required permissions 
 void fileValidation(int fileDesc) {
     if (fileDesc == -1) {
         if (errno==ENOENT) {
@@ -101,7 +95,6 @@ void fileValidation(int fileDesc) {
     }
 }
 
-// directory creation with read, write and execute permissions 
 void createDirectory(const char *directoryName) {
     struct stat stats;
     // Check if the directory exists
@@ -117,7 +110,6 @@ void createDirectory(const char *directoryName) {
     }
 }
 
-// updation progresss bar
 void progressBar(int totalProgress) {
     printOnConsole("\r"); 
     for (int i=0;i<50;++i) {
@@ -133,7 +125,6 @@ void progressBar(int totalProgress) {
     fflush(stdout);
 }
 
-// function to perform block wise reversal
 void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long blockSize, off_t fileSize) {
     // allocating in the heap so that there won't be any stack overflow 
     off_t progress = 0;
@@ -176,12 +167,10 @@ void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long b
 
         int totalProgress = (progress*100)/fileSize;
         progressBar(totalProgress);
-        usleep(sleepValue);
     }
     free(buffer);
 }
 
-// file creation with read and write permissions 
 int createOuputFile(const char *directoryName, const char *filepath, long long flag) {
     // "Assignment1/flag_<input_file_name>"
     char completePath[1024];
@@ -199,6 +188,8 @@ int createOuputFile(const char *directoryName, const char *filepath, long long f
 
 // file to reverse the whole file 
 void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
+    // what we are doing is, we are going to the end and then reversing the blocks and then
+    // writing this blocks at the starting of the file 
     // we need to move the pointer to the end
     off_t offset = filesize;
     off_t index = filesize;
@@ -226,6 +217,7 @@ void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
             printOnConsole("Error while reading the input file");
             _exit(1);
         }
+        // reversing the single buffer block
         for(int i=0;i<n/2;++i) {
             char temp = buffer[i];
             buffer[i] = buffer[n-i-1];
@@ -239,12 +231,14 @@ void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
         index -= n;
         int totalProgress = (progress*100)/filesize;
         progressBar(totalProgress);
-        usleep(sleepValue);
     }
     free(buffer);
 }
 
 // reverse the file when start and end index are given
+void partialReversal(int inputFileDesc, int outputFileDesc, off_t filesize, long long startIndex, long long endIndex) {
+
+}
 
 int main(int argc, char *argv[]) {
     if(argc<3) {
@@ -272,8 +266,6 @@ int main(int argc, char *argv[]) {
         else {
             // ./a.out <input_file> 0 <block_size>
             const char* filepath = argv[1];
-
-            char *endptr;
             long long blocksize = isBlockSizeValid(argv[3]);
 
             // the property of stroll is that it will read only till the digits are present 
@@ -282,21 +274,17 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
 
-            // open the file in read only 
+            // open the file in read only mode
             int originalFileDesc = open(filepath, O_RDONLY); 
             if(originalFileDesc==-1) {
                 printOnConsole("Erorr while opening the input file");
                 _exit(1);
             }
 
-            // validating the file 
             fileValidation(originalFileDesc);
-
-            // directory creation 
             const char *directName = "Assignment1";
             createDirectory(directName);
 
-            // descriptor for output file
             int outputFileDesc = createOuputFile(directName,filepath,(long long)flag);
             if(outputFileDesc==-1) {
                 printOnConsole("Error while creating the output file");
@@ -306,7 +294,6 @@ int main(int argc, char *argv[]) {
 
             struct stat fileStat;
             fstat(originalFileDesc,&fileStat);
-            // off_t is 64 bits and hence can store till ~8 exa bytes
             off_t originalFileSize = fileStat.st_size; 
             if(originalFileSize<0) {
                 printOnConsole("Error while calculating the file size");
@@ -321,13 +308,13 @@ int main(int argc, char *argv[]) {
             // Do block wise reversal 
             performBlockwiseReversal(originalFileDesc, outputFileDesc, blocksize, originalFileSize);
 
-            // close the file 
+            // close the files
             close(originalFileDesc);
             close(outputFileDesc);
         }
     }
 
-    // flag 1 is used to do complete file reversal
+    //-------------------------------flag 1 is used to do complete file reversal---------------------------
     else if(flag==1) {
         if(argc!=3) {
             printOnConsole("Wrong number of arguments\n");
@@ -335,21 +322,17 @@ int main(int argc, char *argv[]) {
             return 1;
         }
         else {
-            // ./a.out <input_file> 1
             const char* filepath = argv[1];
             int originalFileDesc = open(filepath, O_RDONLY); 
             if(originalFileDesc==-1) {
                 printOnConsole("Error while opening the input file");
                 _exit(1);
             }
-            // validating the file 
-            fileValidation(originalFileDesc);
 
-            // directory creation
+            fileValidation(originalFileDesc);
             const char * directName = "Assignment1";
             createDirectory(directName);
 
-            // descriptor for output file
             int outputFileDesc = createOuputFile(directName,filepath,(long long)flag);
             if(outputFileDesc==-1) {
                 printOnConsole("Error while creating the output file");
@@ -357,7 +340,6 @@ int main(int argc, char *argv[]) {
                 _exit(1);
             }
 
-            // file size 
             struct stat fileStat;
             fstat(originalFileDesc,&fileStat);
             off_t originalFileSize = fileStat.st_size;  
@@ -368,7 +350,7 @@ int main(int argc, char *argv[]) {
                 _exit(1);
             }
 
-            // reverse the file 
+            // reverse the entire file 
             reverseTheFile(originalFileDesc, outputFileDesc, originalFileSize);
 
             // close the file 
@@ -377,7 +359,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // flag 2 is used to do the reversal in the given range of index
+    //-------------------------------flag 2 is used to do the reversal in the given range of index---------------------------
     else if(flag==2) {
         if(argc!=5) {
             printOnConsole("Wrong number of arguments\n");
