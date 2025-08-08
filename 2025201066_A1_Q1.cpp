@@ -1,11 +1,3 @@
-// don't use snprintf
-// check the file permissions before checking whether the input file has those errors
-// give correct permissions to the file 
-// max block size will be 8MB
-// check the uid and file modes
-// mmap : read research paper 
-// make the console verbose 
-
 #include<stdio.h>
 #include<unistd.h> // contains read, write, close sys calls
 #include<cstring>
@@ -140,6 +132,10 @@ void fileValidation(int fileDesc) {
             printOnConsole("No such file exists\n");
             _exit(1);
         }
+        if(errno==EACCES) {
+            printOnConsole("You don't have required permissions to access this file\n");
+            _exit(1);
+        }
     }
 }
 
@@ -181,6 +177,8 @@ void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long b
     char* buffer = (char*)malloc(blockSize);
     if(buffer==NULL) {
         printOnConsole("Memory allocation was unsuccessful\n");
+        if(inputFileDesc>=0) close(inputFileDesc);
+        if(outputFileDesc>=0) close(outputFileDesc);
         _exit(1);
     }
 
@@ -188,8 +186,10 @@ void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long b
     while (currOffset<fileSize) {
         ssize_t bytesRead = read(inputFileDesc,buffer,(ssize_t)blockSize);
         if(bytesRead==-1) {
-            printOnConsole("Error while reading the input file");
+            printOnConsole("Error while reading the input file\n");
             free(buffer);
+            if(inputFileDesc>=0) close(inputFileDesc);
+            if(outputFileDesc>=0) close(outputFileDesc);
             _exit(1);
         }
 
@@ -199,8 +199,10 @@ void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long b
         singleBlockReversal(buffer,bytesRead);
 
         if(write(outputFileDesc,buffer,bytesRead)==-1) {
-            printOnConsole("Error while writing to the ouptut file");
+            printOnConsole("Error while writing to the ouptut file\n");
             free(buffer);
+            if(inputFileDesc>=0) close(inputFileDesc);
+            if(outputFileDesc>=0) close(outputFileDesc);
             _exit(1);
         }
         // Current offset value updation
@@ -226,6 +228,8 @@ void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
     char *buffer = (char*)malloc(blocksize);
     if(buffer==NULL) {
         printOnConsole("Memory allocation was unsuccessful\n");
+        if(inputFileDesc>=0) close(inputFileDesc);
+        if(outputFileDesc>=0) close(outputFileDesc);
         _exit(1);
     }
     
@@ -237,22 +241,28 @@ void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
             n = index;
         }
         if(lseek(inputFileDesc,index-n,SEEK_SET)==-1) {
-            printOnConsole("Error while seeking the input file");
+            printOnConsole("Error while seeking the input file\n");
             free(buffer);
+            if(inputFileDesc>=0) close(inputFileDesc);
+            if(outputFileDesc>=0) close(outputFileDesc);
             _exit(1);
         }
 
         if(read(inputFileDesc,buffer,n)==-1) {
-            printOnConsole("Error while reading the input file");
+            printOnConsole("Error while reading the input file\n");
             free(buffer);
+            if(inputFileDesc>=0) close(inputFileDesc);
+            if(outputFileDesc>=0) close(outputFileDesc);
             _exit(1);
         }
         // reversing the single buffer block
         singleBlockReversal(buffer,n);
 
         if(write(outputFileDesc,buffer,n)==-1) {
-            printOnConsole("Error while writing to the output file");
+            printOnConsole("Error while writing to the output file\n");
             free(buffer);
+            if(inputFileDesc>=0) close(inputFileDesc);
+            if(outputFileDesc>=0) close(outputFileDesc);
             _exit(1);
         };
         progress+=n;
@@ -271,6 +281,8 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
     char* buffer = (char*)malloc((int)blockSize);
     if(buffer==NULL) {
         printOnConsole("Memory allocation was unsuccessful\n");
+        if(inputFileDesc>=0) close(inputFileDesc);
+        if(outputFileDesc>=0) close(outputFileDesc);
         _exit(1);
     }
 
@@ -284,8 +296,10 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
 
         ssize_t bytesStored = read(inputFileDesc,buffer,bytesRead);
         if(bytesStored==-1) {
-            printOnConsole("Error while reading the input file");
+            printOnConsole("Error while reading the input file\n");
             free(buffer);
+            if(inputFileDesc>=0) close(inputFileDesc);
+            if(outputFileDesc>=0) close(outputFileDesc);
             _exit(1);
         }
 
@@ -295,8 +309,10 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
         singleBlockReversal(buffer,bytesStored);
 
         if(write(outputFileDesc,buffer,bytesStored)==-1) {
-            printOnConsole("Error while writing to the ouptut file");
+            printOnConsole("Error while writing to the ouptut file\n");
             free(buffer);
+            if(inputFileDesc>=0) close(inputFileDesc);
+            if(outputFileDesc>=0) close(outputFileDesc);
             _exit(1);
         }
         // Current offset value updation
@@ -316,16 +332,20 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
 
         ssize_t bytesStored = read(inputFileDesc,buffer,bytesRead);
         if(bytesStored==-1) {
-            printOnConsole("Error while reading the input file");
+            printOnConsole("Error while reading the input file\n");
             free(buffer);
+            if(inputFileDesc>=0) close(inputFileDesc);
+            if(outputFileDesc>=0) close(outputFileDesc);
             _exit(1);
         }
 
         if(bytesStored==0) break;
 
         if(write(outputFileDesc,buffer,bytesStored)==-1) {
-            printOnConsole("Error while writing to the ouptut file");
+            printOnConsole("Error while writing to the ouptut file\n");
             free(buffer);
+            if(inputFileDesc>=0) close(inputFileDesc);
+            if(outputFileDesc>=0) close(outputFileDesc);
             _exit(1);
         }
         // Current offset value updation
@@ -340,8 +360,10 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
     while (currOffset<fileSize) {
         ssize_t bytesRead = read(inputFileDesc, buffer, blockSize);
         if(bytesRead==-1) {
-            printOnConsole("Error while reading the input file");
+            printOnConsole("Error while reading the input file\n");
             free(buffer);
+            if(inputFileDesc>=0) close(inputFileDesc);
+            if(outputFileDesc>=0) close(outputFileDesc);
             _exit(1);
         }
         if(bytesRead<=0) break;
@@ -349,8 +371,10 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
         singleBlockReversal(buffer,bytesRead);
 
         if(write(outputFileDesc,buffer,bytesRead)==-1) {
-            printOnConsole("Error while writing output file");
+            printOnConsole("Error while writing output file\n");
             free(buffer);
+            if(inputFileDesc>=0) close(inputFileDesc);
+            if(outputFileDesc>=0) close(outputFileDesc);
             _exit(1);
         }
         currOffset+=bytesRead;
@@ -368,7 +392,7 @@ int createOutputFile(const char *directoryName, const char *filepath, long long 
 
     int outputFileDesc = open(completePath, O_CREAT | O_WRONLY | O_TRUNC, 0600); // read and write permissions
     if(outputFileDesc==-1) {
-        printOnConsole("Error while creating the output file");
+        printOnConsole("Error while creating the output file\n");
         _exit(1);
     }
     return outputFileDesc;
@@ -393,6 +417,7 @@ int main(int argc, char *argv[]) {
 
     //-------------------------------flag 0 is used to do block-wise reversal---------------------------
     if(flag==0) {
+        printOnConsole("--------------------Mode: Blockwise reversal--------------------\n");
         if(argc!=4) {
             printOnConsole("Wrong number of arguments\n");
             printCommandUsage();
@@ -413,17 +438,7 @@ int main(int argc, char *argv[]) {
             int originalFileDesc = open(filepath, O_RDONLY); 
             if(originalFileDesc==-1) {
                 fileValidation(originalFileDesc);
-                printOnConsole("Error while opening the input file");
-                _exit(1);
-            }
-
-            const char *directName = "Assignment1";
-            createDirectory(directName);
-
-            int outputFileDesc = createOutputFile(directName,filepath,(long long)flag);
-            if(outputFileDesc==-1) {
-                printOnConsole("Error while creating the output file");
-                close(originalFileDesc);
+                printOnConsole("Error while opening the input file\n");
                 _exit(1);
             }
 
@@ -431,11 +446,32 @@ int main(int argc, char *argv[]) {
             fstat(originalFileDesc,&fileStat);
             off_t originalFileSize = fileStat.st_size; 
             if(originalFileSize<0) {
-                printOnConsole("Error while calculating the file size");
+                printOnConsole("Error while calculating the file size\n");
                 close(originalFileDesc);
-                close(outputFileDesc);
                 _exit(1);
             }
+            if(originalFileSize==0) {
+                printOnConsole("File is empty\n");
+                _exit(1);
+            }
+
+            printOnConsole("Block size: ");
+            printOnConsole(argv[3]);
+            printOnConsole("\nFile size: ");
+            printInteger(originalFileSize);
+            printOnConsole(" bytes");
+            printOnConsole("\n");
+
+            const char *directName = "Assignment1";
+            createDirectory(directName);
+
+            int outputFileDesc = createOutputFile(directName,filepath,(long long)flag);
+            if(outputFileDesc==-1) {
+                printOnConsole("Error while creating the output file\n");
+                close(originalFileDesc);
+                _exit(1);
+            }
+
             if(blocksize>originalFileSize) {
                 printOnConsole("Warning: Block size is greater than the file size\n");
             } 
@@ -451,6 +487,7 @@ int main(int argc, char *argv[]) {
 
     //-------------------------------flag 1 is used to do complete file reversal---------------------------
     else if(flag==1) {
+        printOnConsole("--------------------Mode: Full file reversal--------------------\n");
         if(argc!=3) {
             printOnConsole("Wrong number of arguments\n");
             printCommandUsage();
@@ -461,27 +498,35 @@ int main(int argc, char *argv[]) {
             int originalFileDesc = open(filepath, O_RDONLY); 
             if(originalFileDesc==-1) {
                 fileValidation(originalFileDesc);
-                printOnConsole("Error while opening the input file");
+                printOnConsole("Error while opening the input file\n");
                 _exit(1);
             }
+
+            struct stat fileStat;
+            fstat(originalFileDesc,&fileStat);
+            off_t originalFileSize = fileStat.st_size; 
+            if(originalFileSize<0) {
+                printOnConsole("Error while calculating the file size\n");
+                close(originalFileDesc);
+                _exit(1);
+            } 
+            if(originalFileSize==0) {
+                printOnConsole("File is empty\n");
+                _exit(1);
+            }
+
+            printOnConsole("File size: ");
+            printInteger(originalFileSize);
+            printOnConsole(" bytes");
+            printOnConsole("\n");
 
             const char * directName = "Assignment1";
             createDirectory(directName);
 
             int outputFileDesc = createOutputFile(directName,filepath,(long long)flag);
             if(outputFileDesc==-1) {
-                printOnConsole("Error while creating the output file");
+                printOnConsole("Error while creating the output file\n");
                 close(originalFileDesc);
-                _exit(1);
-            }
-
-            struct stat fileStat;
-            fstat(originalFileDesc,&fileStat);
-            off_t originalFileSize = fileStat.st_size;  
-            if(originalFileSize<0) {
-                printOnConsole("Error while calculating the file size");
-                close(originalFileDesc);
-                close(outputFileDesc);
                 _exit(1);
             }
 
@@ -496,6 +541,7 @@ int main(int argc, char *argv[]) {
 
     //-------------------------------flag 2 is used to do the reversal in the given range of index---------------------------
     else if(flag==2) {
+        printOnConsole("--------------------Mode: Partial range reversal--------------------\n");
         if(argc!=5) {
             printOnConsole("Wrong number of arguments\n");
             printCommandUsage();
@@ -511,34 +557,42 @@ int main(int argc, char *argv[]) {
             int originalFileDesc = open(filepath, O_RDONLY); 
             if(originalFileDesc==-1) {
                 fileValidation(originalFileDesc);
-                printOnConsole("Error while opening the input file");
+                printOnConsole("Error while opening the input file\n");
                 _exit(1);
             }
 
             struct stat fileStat;
             fstat(originalFileDesc,&fileStat);
             off_t originalFileSize = fileStat.st_size; 
+            if(originalFileSize<0) {
+                printOnConsole("Error while calculating the file size\n");
+                close(originalFileDesc);
+                _exit(1);
+            }
+            if(originalFileSize==0) {
+                printOnConsole("File is empty\n");
+                _exit(1);
+            }
             isIndexValid(startIndex,endIndex,originalFileSize);
             char *endptr;
             long long startInd = strtoll(startIndex,&endptr,10);
             long long endInd = strtoll(endIndex,&endptr,10);
-            // std::cout << "StartIndex: " << startInd << " " << std::endl;
-            // std::cout << "EndIndex: " << endInd << " " << std::endl;
+            printOnConsole("Start index: ");
+            printInteger(startInd);
+            printOnConsole("\nEnd index: ");
+            printInteger(endInd);
+            printOnConsole("\nFile size: ");
+            printInteger(originalFileSize);
+            printOnConsole(" bytes");
+            printOnConsole("\n");
 
             const char * directName = "Assignment1";
             createDirectory(directName);
 
             int outputFileDesc = createOutputFile(directName,filepath,(long long)flag);
             if(outputFileDesc==-1) {
-                printOnConsole("Error while creating the output file");
+                printOnConsole("Error while creating the output file\n");
                 close(originalFileDesc);
-                _exit(1);
-            }
- 
-            if(originalFileSize<0) {
-                printOnConsole("Error while calculating the file size");
-                close(originalFileDesc);
-                close(outputFileDesc);
                 _exit(1);
             }
 

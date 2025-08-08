@@ -1,5 +1,8 @@
 # 2025201066_A1
 
+# Creating 5GB size file 
+truncate -s 5G bigfile
+
 git add .
 git commit -m "type the message"
 git push origin main 
