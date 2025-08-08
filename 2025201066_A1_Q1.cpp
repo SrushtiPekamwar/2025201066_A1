@@ -1,12 +1,10 @@
-// changes in stroll
 // don't use snprintf
-// change the progress bar 
 // check the file permissions before checking whether the input file has those errors
 // give correct permissions to the file 
 // max block size will be 8MB
 // check the uid and file modes
-// use byte read for block reversal
 // mmap : read research paper 
+// make the console verbose 
 
 #include<stdio.h>
 #include<unistd.h> // contains read, write, close sys calls
@@ -19,7 +17,7 @@
 #include<sys/types.h> // mode_t
 #include<iostream>
 
-int sleepValue = 1000;
+int sleepValue = 10;
 
 // function to print onto the console, this is just like the wrapper of printf 
 void printOnConsole(const char *msg) {
@@ -65,6 +63,51 @@ long long isBlockSizeValid(const char *c) {
     return blocksize;
 }
 
+void isIndexValid(const char *startIndex, const char *endIndex, off_t filesize) {
+    // need to convert them into long long and then need to compare that 0 <= start <= end < eof
+    char* endptr;  // endptr will point to the first invalid character after the number
+    long long maximum = LLONG_MAX;
+    long long startInd = strtoll(startIndex,&endptr,10);
+    if (*endptr != '\0') {
+        printOnConsole("Start index should be an integer\n");
+        _exit(1);
+    }
+    long long endInd = strtoll(endIndex,&endptr,10);
+    if(*endptr != '\0') {
+        printOnConsole("End index should be an integer\n");
+        _exit(1);
+    }
+
+    if(startInd<0 || endInd<0) {
+        printOnConsole("Index should be positive\n");
+        _exit(1);
+    }
+
+    // to avoid overflow
+    if(startInd>maximum || endInd>maximum) {
+        printOnConsole("Overflow: Index size is very large\n");
+        _exit(1);
+    }
+
+    // start index should be less than the file size 
+    if(startInd>=filesize) {
+        printOnConsole("Start index must be less than the file size\n");
+        _exit(1);
+    }
+
+    // end should be less than the file size 
+    if(endInd>=filesize) {
+        printOnConsole("End index must be less than the file size\n");
+        _exit(1);
+    }
+
+    // check 
+    if(endInd<startInd) {
+        printOnConsole("End index must be greater than the start index\n");
+        _exit(1);
+    }
+}
+
 int isFlagValid(const char *c) {
     char* endptr;
     long long flag = strtoll(c, &endptr, 10);
@@ -105,7 +148,7 @@ void createDirectory(const char *directoryName) {
     // Check if the directory exists
     if (stat(directoryName,&stats)==0) {
         printOnConsole(directoryName);
-        printOnConsole(" already exists\n");
+        printOnConsole(" directory already exists\n");
         return;
     }
     // Create directory and give user permissions of read, write and execute
@@ -119,62 +162,204 @@ void progressBar(float totalProgress) {
     printOnConsole("\r"); 
     printOnConsole("Progress: ");
     char buffer[16];
+    // we are just storing the string in the buffer instead of printing it to the screen with the help of snprintf
     snprintf(buffer, sizeof(buffer), "%.2f%%", totalProgress);
     printOnConsole(buffer);
     fflush(stdout);
 }
 
+void singleBlockReversal(char *buffer, ssize_t bytesRead) {
+    for(ssize_t i=0;i<bytesRead/2;++i) {
+        char temp = buffer[i];
+        buffer[i] = buffer[bytesRead-i-1];
+        buffer[bytesRead-i-1] = temp;
+    }
+}
+
 void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long blockSize, off_t fileSize) {
     // allocating in the heap so that there won't be any stack overflow 
-    off_t progress = 0;
     char* buffer = (char*)malloc(blockSize);
-    off_t currOffset = 0;
     if(buffer==NULL) {
         printOnConsole("Memory allocation was unsuccessful\n");
         _exit(1);
     }
 
+    off_t currOffset = 0;
     while (currOffset<fileSize) {
-        ssize_t blocksRead = blockSize;
-
-        // this will also handle when the last block size is greater than the file size 
-        if (currOffset+blockSize>fileSize) {
-            blocksRead = fileSize-currOffset;
-        }
-
-        if(lseek(inputFileDesc,currOffset,SEEK_SET)==-1) {
-            printOnConsole("Error while seeking the input file");
-            delete[] buffer;
-            _exit(1);
-        }
-        if(read(inputFileDesc,buffer,blocksRead)==-1) {
+        ssize_t bytesRead = read(inputFileDesc,buffer,(ssize_t)blockSize);
+        if(bytesRead==-1) {
             printOnConsole("Error while reading the input file");
-            delete[] buffer;
+            free(buffer);
             _exit(1);
         }
+
+        if(bytesRead==0) break;
+
         // Reversing the contents of the current block
-        for(ssize_t i=0;i<blocksRead/2;++i) {
-            char temp = buffer[i];
-            buffer[i] = buffer[blocksRead-i-1];
-            buffer[blocksRead-i-1] = temp;
-        }
-        if(write(outputFileDesc,buffer,blocksRead)==-1) {
+        singleBlockReversal(buffer,bytesRead);
+
+        if(write(outputFileDesc,buffer,bytesRead)==-1) {
             printOnConsole("Error while writing to the ouptut file");
-            delete[] buffer;
+            free(buffer);
             _exit(1);
         }
         // Current offset value updation
-        currOffset += blocksRead;
-        progress += blocksRead;
+        currOffset += bytesRead;
 
-        float totalProgress = (progress*100.0)/fileSize;
+        float totalProgress = (currOffset*100.0)/fileSize;
         progressBar(totalProgress);
-        usleep(sleepValue);
+        // usleep(sleepValue); 
     }
-    delete[] buffer;
+    free(buffer);
 }
 
-int createOuputFile(const char *directoryName, const char *filepath, long long flag) {
+// file to reverse the whole file 
+void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
+    // what we are doing is, we are going to the end and then reversing the blocks and then
+    // writing this blocks at the starting of the file 
+    // we need to move the pointer to the end
+    off_t offset = filesize, index = filesize;
+    off_t progress = 0;
+    int blocksize = 1024;
+
+    // allocating in the heap so that there won't be any stack overflow 
+    char *buffer = (char*)malloc(blocksize);
+    if(buffer==NULL) {
+        printOnConsole("Memory allocation was unsuccessful\n");
+        _exit(1);
+    }
+    
+    // here we can't take index>=0 because then for the progree+=n we will be adding 0 and then
+    // it will lead to infinite loop
+    while(index>0) {
+        size_t n = blocksize;
+        if(index-blocksize<=0) {
+            n = index;
+        }
+        if(lseek(inputFileDesc,index-n,SEEK_SET)==-1) {
+            printOnConsole("Error while seeking the input file");
+            free(buffer);
+            _exit(1);
+        }
+
+        if(read(inputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while reading the input file");
+            free(buffer);
+            _exit(1);
+        }
+        // reversing the single buffer block
+        singleBlockReversal(buffer,n);
+
+        if(write(outputFileDesc,buffer,n)==-1) {
+            printOnConsole("Error while writing to the output file");
+            free(buffer);
+            _exit(1);
+        };
+        progress+=n;
+        index-=n;
+        int totalProgress = (progress*100)/filesize;
+        progressBar(totalProgress);
+        // usleep(10000); 
+    }
+    free(buffer);
+}
+
+// reverse the file when start and end index are given
+void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long long startIndex, long long endIndex) {
+    // reverse from 0 to start and then reverse from end to eof
+    ssize_t blockSize = 1024;
+    char* buffer = (char*)malloc((int)blockSize);
+    if(buffer==NULL) {
+        printOnConsole("Memory allocation was unsuccessful\n");
+        _exit(1);
+    }
+
+    //-------------------Reverse from 0th index to the startIndex--------------------------
+    off_t currOffset = 0;
+    while (currOffset<=startIndex) {
+        ssize_t bytesRead = blockSize;
+        if(currOffset+bytesRead>startIndex+1) {
+            bytesRead = startIndex+1-currOffset;
+        }
+
+        ssize_t bytesStored = read(inputFileDesc,buffer,bytesRead);
+        if(bytesStored==-1) {
+            printOnConsole("Error while reading the input file");
+            free(buffer);
+            _exit(1);
+        }
+
+        if(bytesStored<=0) break;
+
+        // Reversing the contents of the current block
+        singleBlockReversal(buffer,bytesStored);
+
+        if(write(outputFileDesc,buffer,bytesStored)==-1) {
+            printOnConsole("Error while writing to the ouptut file");
+            free(buffer);
+            _exit(1);
+        }
+        // Current offset value updation
+        currOffset += bytesStored;
+
+        float totalProgress = (currOffset*100.0)/fileSize;
+        progressBar(totalProgress);
+        // usleep(sleepValue); 
+    }
+
+    //-----------------Keep the values from startIndex+1 to endIndex-1 as same---------------
+    while(currOffset<endIndex) {
+        ssize_t bytesRead = blockSize;
+        if(currOffset+bytesRead>endIndex) {
+            bytesRead = endIndex-currOffset;
+        }
+
+        ssize_t bytesStored = read(inputFileDesc,buffer,bytesRead);
+        if(bytesStored==-1) {
+            printOnConsole("Error while reading the input file");
+            free(buffer);
+            _exit(1);
+        }
+
+        if(bytesStored==0) break;
+
+        if(write(outputFileDesc,buffer,bytesStored)==-1) {
+            printOnConsole("Error while writing to the ouptut file");
+            free(buffer);
+            _exit(1);
+        }
+        // Current offset value updation
+        currOffset += bytesStored;
+
+        float totalProgress = (currOffset*100.0)/fileSize;
+        progressBar(totalProgress);
+        // usleep(sleepValue); 
+    }
+
+    //---------------------Reverse the file from endIndex+1 to the EOF--------------------------
+    while (currOffset<fileSize) {
+        ssize_t bytesRead = read(inputFileDesc, buffer, blockSize);
+        if(bytesRead==-1) {
+            printOnConsole("Error while reading the input file");
+            free(buffer);
+            _exit(1);
+        }
+        if(bytesRead<=0) break;
+
+        singleBlockReversal(buffer,bytesRead);
+
+        if(write(outputFileDesc,buffer,bytesRead)==-1) {
+            printOnConsole("Error while writing output file");
+            free(buffer);
+            _exit(1);
+        }
+        currOffset+=bytesRead;
+        progressBar((currOffset*100.0)/fileSize);
+    }
+    free(buffer);
+}
+
+int createOutputFile(const char *directoryName, const char *filepath, long long flag) {
     // "Assignment1/flag_<input_file_name>"
     char completePath[1024];
     char *copyOfPath = strdup(filepath);
@@ -189,62 +374,6 @@ int createOuputFile(const char *directoryName, const char *filepath, long long f
     return outputFileDesc;
 }
 
-// file to reverse the whole file 
-void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
-    // what we are doing is, we are going to the end and then reversing the blocks and then
-    // writing this blocks at the starting of the file 
-    // we need to move the pointer to the end
-    off_t offset = filesize;
-    off_t index = filesize;
-    int blocksize = 1024;
-    off_t progress = 0;
-
-    // allocating in the heap so that there won't be any stack overflow 
-    char *buffer = (char*)malloc(blocksize);
-    if(buffer==NULL) {
-        printOnConsole("Memory allocation was unsuccessful\n");
-        _exit(1);
-    }
-    
-    while(index>0) {
-        size_t n = blocksize;
-        if(index-blocksize<=0) {
-            n = index;
-        }
-        if(lseek(inputFileDesc,index-n,SEEK_SET)==-1) {
-            printOnConsole("Error while seeking the input file");
-            delete[] buffer;
-            _exit(1);
-        }
-
-        if(read(inputFileDesc,buffer,n)==-1) {
-            printOnConsole("Error while reading the input file");
-            delete[] buffer;
-            _exit(1);
-        }
-        // reversing the single buffer block
-        for(int i=0;i<n/2;++i) {
-            char temp = buffer[i];
-            buffer[i] = buffer[n-i-1];
-            buffer[n-i-1] = temp;
-        }
-        if(write(outputFileDesc,buffer,n)==-1) {
-            printOnConsole("Error while writing to the output file");
-            delete[] buffer;
-            _exit(1);
-        };
-        progress+=n;
-        index -= n;
-        int totalProgress = (progress*100)/filesize;
-        progressBar(totalProgress);
-    }
-    delete[] buffer;
-}
-
-// reverse the file when start and end index are given
-void partialReversal(int inputFileDesc, int outputFileDesc, off_t filesize, long long startIndex, long long endIndex) {
-
-}
 
 int main(int argc, char *argv[]) {
     if(argc<3) {
@@ -291,7 +420,7 @@ int main(int argc, char *argv[]) {
             const char *directName = "Assignment1";
             createDirectory(directName);
 
-            int outputFileDesc = createOuputFile(directName,filepath,(long long)flag);
+            int outputFileDesc = createOutputFile(directName,filepath,(long long)flag);
             if(outputFileDesc==-1) {
                 printOnConsole("Error while creating the output file");
                 close(originalFileDesc);
@@ -339,7 +468,7 @@ int main(int argc, char *argv[]) {
             const char * directName = "Assignment1";
             createDirectory(directName);
 
-            int outputFileDesc = createOuputFile(directName,filepath,(long long)flag);
+            int outputFileDesc = createOutputFile(directName,filepath,(long long)flag);
             if(outputFileDesc==-1) {
                 printOnConsole("Error while creating the output file");
                 close(originalFileDesc);
@@ -375,6 +504,50 @@ int main(int argc, char *argv[]) {
         else {
             // get the filename, flag, start index and the end index
             // start index can't be greater than end index 
+            const char* filepath = argv[1];
+            const char* startIndex = argv[3];
+            const char* endIndex = argv[4];
+
+            int originalFileDesc = open(filepath, O_RDONLY); 
+            if(originalFileDesc==-1) {
+                fileValidation(originalFileDesc);
+                printOnConsole("Error while opening the input file");
+                _exit(1);
+            }
+
+            struct stat fileStat;
+            fstat(originalFileDesc,&fileStat);
+            off_t originalFileSize = fileStat.st_size; 
+            isIndexValid(startIndex,endIndex,originalFileSize);
+            char *endptr;
+            long long startInd = strtoll(startIndex,&endptr,10);
+            long long endInd = strtoll(endIndex,&endptr,10);
+            // std::cout << "StartIndex: " << startInd << " " << std::endl;
+            // std::cout << "EndIndex: " << endInd << " " << std::endl;
+
+            const char * directName = "Assignment1";
+            createDirectory(directName);
+
+            int outputFileDesc = createOutputFile(directName,filepath,(long long)flag);
+            if(outputFileDesc==-1) {
+                printOnConsole("Error while creating the output file");
+                close(originalFileDesc);
+                _exit(1);
+            }
+ 
+            if(originalFileSize<0) {
+                printOnConsole("Error while calculating the file size");
+                close(originalFileDesc);
+                close(outputFileDesc);
+                _exit(1);
+            }
+
+            // reverse the first and last portion of the file 
+            partialReversal(originalFileDesc,outputFileDesc,originalFileSize,startInd-1,endInd+1);
+
+            // close the file 
+            close(originalFileDesc);
+            close(outputFileDesc);
         }
     }
 
