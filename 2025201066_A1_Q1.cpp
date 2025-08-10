@@ -439,7 +439,7 @@ int main(int argc, char *argv[]) {
             if(originalFileDesc==-1) {
                 fileValidation(originalFileDesc);
                 printOnConsole("Error while opening the input file\n");
-                _exit(1);
+                return 1;
             }
 
             struct stat fileStat;
@@ -448,11 +448,10 @@ int main(int argc, char *argv[]) {
             if(originalFileSize<0) {
                 printOnConsole("Error while calculating the file size\n");
                 close(originalFileDesc);
-                _exit(1);
+                return 1;
             }
             if(originalFileSize==0) {
                 printOnConsole("File is empty\n");
-                _exit(1);
             }
 
             printOnConsole("Block size: ");
@@ -469,7 +468,7 @@ int main(int argc, char *argv[]) {
             if(outputFileDesc==-1) {
                 printOnConsole("Error while creating the output file\n");
                 close(originalFileDesc);
-                _exit(1);
+                return 1;
             }
 
             if(blocksize>originalFileSize) {
@@ -499,7 +498,7 @@ int main(int argc, char *argv[]) {
             if(originalFileDesc==-1) {
                 fileValidation(originalFileDesc);
                 printOnConsole("Error while opening the input file\n");
-                _exit(1);
+                return 1;
             }
 
             struct stat fileStat;
@@ -508,11 +507,10 @@ int main(int argc, char *argv[]) {
             if(originalFileSize<0) {
                 printOnConsole("Error while calculating the file size\n");
                 close(originalFileDesc);
-                _exit(1);
+                return 1;
             } 
             if(originalFileSize==0) {
                 printOnConsole("File is empty\n");
-                _exit(1);
             }
 
             printOnConsole("File size: ");
@@ -527,7 +525,7 @@ int main(int argc, char *argv[]) {
             if(outputFileDesc==-1) {
                 printOnConsole("Error while creating the output file\n");
                 close(originalFileDesc);
-                _exit(1);
+                return 1;
             }
 
             // reverse the entire file 
@@ -558,7 +556,7 @@ int main(int argc, char *argv[]) {
             if(originalFileDesc==-1) {
                 fileValidation(originalFileDesc);
                 printOnConsole("Error while opening the input file\n");
-                _exit(1);
+                return 1;
             }
 
             struct stat fileStat;
@@ -567,11 +565,10 @@ int main(int argc, char *argv[]) {
             if(originalFileSize<0) {
                 printOnConsole("Error while calculating the file size\n");
                 close(originalFileDesc);
-                _exit(1);
+                return 1;
             }
             if(originalFileSize==0) {
                 printOnConsole("File is empty\n");
-                _exit(1);
             }
             isIndexValid(startIndex,endIndex,originalFileSize);
             char *endptr;
@@ -593,7 +590,7 @@ int main(int argc, char *argv[]) {
             if(outputFileDesc==-1) {
                 printOnConsole("Error while creating the output file\n");
                 close(originalFileDesc);
-                _exit(1);
+                return 1;
             }
 
             // reverse the first and last portion of the file 
