@@ -151,11 +151,13 @@ void directoryValidation(const char *directoryName) {
     struct stat stats;
     // Check if the directory exists
     if (stat(directoryName,&stats)==0) {
-        printOnConsole("Assignment 1 directory is created: Yes\n");
+        printOnConsole(directoryName);
+        printOnConsole(" directory is created: Yes\n");
         return;
     }
     else {
-        printOnConsole("Assignment 1 directory does not exist\n");
+        printOnConsole(directoryName);
+        printOnConsole(" directory does not exist\n");
         _exit(1);
     }
 }
@@ -303,6 +305,170 @@ bool isFileReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSize) 
     return true;
 }
 
+// check if the contents have been correctly processed for the partial file reversal
+bool isPartialReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSize, const char* startInd, const char* endInd) {
+    ssize_t blockSize = 1024;
+    char* buffer1 = (char*)malloc(blockSize);
+    char* buffer2 = (char*)malloc(blockSize);
+    if(buffer1==NULL || buffer2==NULL) {
+        printOnConsole("Memory allocation was unsuccessful\n");
+        if(inputFileDesc>=0) close(inputFileDesc);
+        if(outputFileDesc>=0) close(outputFileDesc);
+        _exit(1);
+    }
+
+    char *endptr;
+    long long startIndex = strtoll(startInd,&endptr,10);
+    long long endIndex = strtoll(endInd,&endptr,10);
+
+    // check the correctness from 0 to startIndex-1
+    off_t low = 0;
+    off_t high = startIndex - 1;
+    while(low<startIndex) {
+        ssize_t bytesRead = blockSize;
+        if(low+bytesRead>startIndex) {
+            bytesRead = startIndex-low;
+        }
+        // read the input file from the front 
+        if(lseek(inputFileDesc,low,SEEK_SET)==-1) {
+            printOnConsole("Error while seeking the input file\n");
+            free(buffer1);
+            free(buffer2);
+            _exit(1);
+        }
+        if(read(inputFileDesc,buffer1,bytesRead)==-1) {
+            printOnConsole("Error while reading the input file\n");
+            free(buffer1);
+            free(buffer2);
+            _exit(1);
+        }
+
+        // read the output file from the back
+        if(lseek(outputFileDesc,high-bytesRead+1,SEEK_SET)==-1) {
+            printOnConsole("Error while seeking the output file\n");
+            free(buffer1);
+            free(buffer2);
+            _exit(1);
+        }
+        if(read(outputFileDesc,buffer2,bytesRead)==-1) {
+            printOnConsole("Error while reading the output file\n");
+            free(buffer1);
+            free(buffer2);
+            _exit(1);
+        }
+        singleBlockReversal(buffer2,bytesRead);
+
+        // compare the input and the output buffer
+        for(ssize_t i=0;i<bytesRead;++i) {
+            if(buffer1[i]!=buffer2[i]) {
+                free(buffer1);
+                free(buffer2);
+                return false;
+            }
+        }
+        low  += bytesRead;
+        high -= bytesRead;
+    }
+
+    // startIndex to endIndex the content should be same
+    ssize_t i = startIndex;
+    while(i<=endIndex) {
+        ssize_t bytesRead = blockSize;
+        if(i+bytesRead>endIndex) {
+            bytesRead = endIndex+1-i;
+        }
+
+        if(lseek(inputFileDesc,i,SEEK_SET)==-1) {
+            printOnConsole("Error while seeking the input file\n");
+            free(buffer1);
+            free(buffer2);
+            _exit(1);
+        }
+        if(read(inputFileDesc,buffer1,bytesRead)==-1) {
+            printOnConsole("Error while reading the input file\n");
+            free(buffer1);
+            free(buffer2);
+            _exit(1);
+        }
+
+        if(lseek(outputFileDesc,i,SEEK_SET)==-1) {
+            printOnConsole("Error while seeking the input file\n");
+            free(buffer1);
+            free(buffer2);
+            _exit(1);
+        }
+        if(read(outputFileDesc,buffer2,bytesRead)==-1) {
+            printOnConsole("Error while reading the input file\n");
+            free(buffer1);
+            free(buffer2);
+            _exit(1);
+        }
+
+        for(ssize_t j=0;j<bytesRead;++j) {
+            if(buffer1[j]!=buffer2[j]) {
+                free(buffer1);
+                free(buffer2);
+                return false;
+            }
+        }
+        i+=bytesRead;
+    }
+
+    // endIndex+1 to EOF check check whether the contents are reversed properly 
+    low = endIndex+1;
+    high = fileSize-1;
+    while(low<fileSize) {
+        ssize_t bytesRead = blockSize;
+        if(low+bytesRead>fileSize) {
+            bytesRead = fileSize-low;
+        }
+
+        // input file traversing
+        if(lseek(inputFileDesc,low,SEEK_SET)==-1) {
+            printOnConsole("Error while seeking the input file\n");
+            free(buffer1);
+            free(buffer2);
+            _exit(1);
+        }
+        if(read(inputFileDesc,buffer1,bytesRead)==-1) {
+            printOnConsole("Error while reading the input file\n");
+            free(buffer1);
+            free(buffer2);
+            _exit(1);
+        }
+
+        // output file traversing
+        if(lseek(outputFileDesc,high-bytesRead+1,SEEK_SET)==-1) {
+            printOnConsole("Error while seeking the input file\n");
+            free(buffer1);
+            free(buffer2);
+            _exit(1);
+        }
+        if(read(outputFileDesc,buffer2,bytesRead)==-1) {
+            printOnConsole("Error while reading the input file\n");
+            free(buffer1);
+            free(buffer2);
+            _exit(1);
+        }
+
+        // reverse the output buffer 
+        singleBlockReversal(buffer2,bytesRead);
+        // comparing both the buffers
+        for(ssize_t i=0;i<bytesRead;++i) {
+            if(buffer1[i]!=buffer2[i]) {
+                free(buffer1);
+                free(buffer2);
+                return false;
+            }
+        }
+        low+=bytesRead;
+        high-=bytesRead;    
+    }
+    free(buffer1);
+    free(buffer2);
+    return true;
+}
+
 // check the permissions of the file
 void filePermissions(const char* filepath) {
     // ls -l myfile.txt checking the permissions through cli
@@ -429,7 +595,7 @@ int main(int argc, char *argv[]) {
     // flag is integer but we get string type from the console 
     long long flag = isFlagValid(argv[4]);
 
-    //-------------------------------flag 0 is used to do block-wise reversal done---------------------------
+    //-------------------------------flag 0 - block-wise reversal done---------------------------
     if(flag==0) {
         printOnConsole("-------------------------Mode: Blockwise reversal-------------------------\n");
         if(argc!=6) {
@@ -479,7 +645,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    //-------------------------------flag 1 is used to do complete file reversal---------------------------
+    //-------------------------------flag 1 - complete file reversal---------------------------
     // For flag 1: ./a.out Assignment1/1_input.txt input.txt Assignment1 1
     else if(flag==1) {
         printOnConsole("--------------------Mode: Full file reversal--------------------\n");
@@ -530,13 +696,57 @@ int main(int argc, char *argv[]) {
 
     //-------------------------------flag 2 is used to do the reversal in the given range of index---------------------------
     else if(flag==2) {
-        // For flag 2: ./a.out Assignment1/2_input.txt input.txt Assignment1 2 5 10
         printOnConsole("--------------------Mode: Partial range reversal--------------------\n");
         if(argc!=7) {
             printOnConsole("Wrong number of arguments for flag 2\n");
             printCommandUsage();
             return 1;
         } 
+        else {
+            // ./a.out <newfilepath> <oldfilepath> <directoryName> <flag> <startIndex> <endIndex>
+            const char* newFilepath = argv[1];
+            const char* oldFilepath = argv[2];
+            const char* directoryName = argv[3];
+            const char* startIndex = argv[5];
+            const char* endIndex = argv[6];
+
+            // validations for the files and the directory 
+            fileValidation(newFilepath);
+            fileValidation(oldFilepath);
+            directoryValidation(directoryName);
+
+            // file descriptors
+            int newfileDesc = open(newFilepath,O_RDONLY);
+            int oldfileDesc = open(oldFilepath,O_RDONLY);
+
+            // check whether the contents have been correctly processed
+            struct stat fileStat;
+            fstat(oldfileDesc,&fileStat);
+            off_t fileSize = fileStat.st_size; // calculating the size of the file 
+
+            // index validation 
+            isIndexValid(startIndex,endIndex,fileSize);
+
+            // check whether the contents have been correctly processed
+            bool correct = isPartialReversalValid(oldfileDesc,newfileDesc,fileSize,startIndex,endIndex);
+            if(correct==true) {
+                printOnConsole("Contents have been correctly processed : Yes\n");
+            }
+            else {
+                printOnConsole("Contents have been correctly processed : No\n");
+            }
+
+            // check whether the file sizes are same 
+            isFileSizeSame(newFilepath,oldFilepath);
+
+            // check permissions for the files
+            filePermissions(newFilepath);
+            filePermissions(oldFilepath);
+            directoryPermissions(directoryName);
+
+            close(newfileDesc);
+            close(oldfileDesc);
+        }
     }
 
     return 0;
