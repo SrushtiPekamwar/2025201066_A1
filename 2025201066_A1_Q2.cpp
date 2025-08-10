@@ -178,17 +178,12 @@ void singleBlockReversal(char *buffer, ssize_t bytesRead) {
     }
 }
 
+// check if the contents have been correctly processed for the blockwise reversal
 bool isBlockwiseReversalValid(int inputFileDesc, int outputFileDesc, long long blockSize, off_t fileSize) {
     // allocating in the heap so that there won't be any stack overflow 
     char* buffer1 = (char*)malloc(blockSize);
-    if(buffer1==NULL) {
-        printOnConsole("Memory allocation was unsuccessful\n");
-        if(inputFileDesc>=0) close(inputFileDesc);
-        if(outputFileDesc>=0) close(outputFileDesc);
-        _exit(1);
-    }
     char* buffer2 = (char*)malloc(blockSize);
-    if(buffer2==NULL) {
+    if(buffer1==NULL || buffer2==NULL) {
         printOnConsole("Memory allocation was unsuccessful\n");
         if(inputFileDesc>=0) close(inputFileDesc);
         if(outputFileDesc>=0) close(outputFileDesc);
@@ -239,6 +234,69 @@ bool isBlockwiseReversalValid(int inputFileDesc, int outputFileDesc, long long b
         }
         // Current offset value updation
         currOffset += inputBytesRead;
+    }
+    free(buffer1);
+    free(buffer2);
+    return true;
+}
+
+// check if the contents have been correctly processed for the complete file reversal
+bool isFileReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSize) {
+    off_t offset = fileSize;
+    int blocksize = 1024;
+
+    // allocating in the heap so that there won't be any stack overflow 
+    char *buffer1 = (char*)malloc(blocksize);
+    char *buffer2 = (char*)malloc(blocksize);
+    if(buffer1==NULL || buffer2==NULL) {
+        printOnConsole("Memory allocation was unsuccessful\n");
+        if(inputFileDesc>=0) close(inputFileDesc);
+        if(outputFileDesc>=0) close(outputFileDesc);
+        _exit(1);
+    }
+    
+    off_t index = 0;
+    while(index<fileSize) {
+        // read input file from the front and read the output file from the back
+        size_t n = blocksize;
+        size_t readBytes = read(inputFileDesc,buffer1,n);
+        if(readBytes==-1) {
+            printOnConsole("Error while reading the input file\n");
+            free(buffer1);
+            free(buffer2);
+            if(inputFileDesc>=0) close(inputFileDesc);
+            if(outputFileDesc>=0) close(outputFileDesc);
+            _exit(1);
+        }
+
+        // set the fd to the end 
+        if(lseek(outputFileDesc,fileSize-index-readBytes,SEEK_SET)==-1) {
+            printOnConsole("Error while seeking the input file\n");
+            free(buffer1);
+            free(buffer2);
+            if(inputFileDesc>=0) close(inputFileDesc);
+            if(outputFileDesc>=0) close(outputFileDesc);
+            _exit(1);
+        }
+
+        if(read(outputFileDesc,buffer2,readBytes)==-1) {
+            printOnConsole("Error while reading the output file\n");
+            free(buffer1);
+            free(buffer2);
+            if(inputFileDesc>=0) close(inputFileDesc);
+            if(outputFileDesc>=0) close(outputFileDesc);
+            _exit(1);
+        }
+
+        // reversing the single buffer block
+        singleBlockReversal(buffer2,readBytes);
+
+        index+=readBytes;
+
+        // compare the blocks
+        for(size_t i=0;i<readBytes;++i) {
+            if(buffer1[i]!=buffer2[i]) return false; 
+        }
     }
     free(buffer1);
     free(buffer2);
@@ -356,9 +414,6 @@ int createOutputFile(const char *directoryName, const char *filepath, long long 
 }
 
 int main(int argc, char *argv[]) {
-    // For flag 1: ./a.out Assignment1/1_input.txt input.txt Assignment1 1
-    // For flag 2: ./a.out Assignment1/2_input.txt input.txt Assignment1 2 5 10
-    // flag 0 : args = 6, flag 1 : args = 5, flag 3 : args = 7 -------- 5,6,7
     if(argc<5) {
         printOnConsole("Number of arguments, fewer than expected\n");
         printCommandUsage();
@@ -375,8 +430,6 @@ int main(int argc, char *argv[]) {
     long long flag = isFlagValid(argv[4]);
 
     //-------------------------------flag 0 is used to do block-wise reversal done---------------------------
-    // For flag 0: ./a.out Assignment1/0_input.txt input.txt Assignment1 0 1024 
-    // check whether the contents have been properly processed
     if(flag==0) {
         printOnConsole("-------------------------Mode: Blockwise reversal-------------------------\n");
         if(argc!=6) {
@@ -385,7 +438,7 @@ int main(int argc, char *argv[]) {
             return 1;
         }
         else {
-            // ./a.out <input_file> 0 <block_size>
+            // ./a.out <newfilepath> <oldfilepath> <directoryName> <flag> <blockSize>
             const char* newFilepath = argv[1];
             const char* oldFilepath = argv[2];
             const char* directoryName = argv[3];
@@ -427,6 +480,7 @@ int main(int argc, char *argv[]) {
     }
 
     //-------------------------------flag 1 is used to do complete file reversal---------------------------
+    // For flag 1: ./a.out Assignment1/1_input.txt input.txt Assignment1 1
     else if(flag==1) {
         printOnConsole("--------------------Mode: Full file reversal--------------------\n");
         if(argc!=5) {
@@ -434,10 +488,49 @@ int main(int argc, char *argv[]) {
             printCommandUsage();
             return 1;
         }
+        else {
+            const char* newFilepath = argv[1];
+            const char* oldFilepath = argv[2];
+            const char* directoryName = argv[3];
+
+            // validations for the files and the directory 
+            fileValidation(newFilepath);
+            fileValidation(oldFilepath);
+            directoryValidation(directoryName);
+
+            // file descriptors
+            int newfileDesc = open(newFilepath,O_RDONLY);
+            int oldfileDesc = open(oldFilepath,O_RDONLY);
+
+            // check whether the contents have been correctly processed
+            struct stat fileStat;
+            fstat(oldfileDesc,&fileStat);
+            off_t fileSize = fileStat.st_size; // calculating the size of the file 
+
+            bool correct = isFileReversalValid(oldfileDesc,newfileDesc,fileSize);
+            if(correct==true) {
+                printOnConsole("Contents have been correctly processed : Yes\n");
+            }
+            else {
+                printOnConsole("Contents have been correctly processed : No\n");
+            }
+
+            // check whether the file sizes are same 
+            isFileSizeSame(newFilepath,oldFilepath);
+
+            // check permissions for the files
+            filePermissions(newFilepath);
+            filePermissions(oldFilepath);
+            directoryPermissions(directoryName);
+
+            close(newfileDesc);
+            close(oldfileDesc);
+        }
     }
 
     //-------------------------------flag 2 is used to do the reversal in the given range of index---------------------------
     else if(flag==2) {
+        // For flag 2: ./a.out Assignment1/2_input.txt input.txt Assignment1 2 5 10
         printOnConsole("--------------------Mode: Partial range reversal--------------------\n");
         if(argc!=7) {
             printOnConsole("Wrong number of arguments for flag 2\n");
