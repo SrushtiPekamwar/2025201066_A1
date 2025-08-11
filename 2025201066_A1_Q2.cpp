@@ -226,8 +226,15 @@ bool isBlockwiseReversalValid(int inputFileDesc, int outputFileDesc, long long b
         // Reversing the contents of the output file block
         singleBlockReversal(buffer2,outputBytesRead);
 
+        // if the last read blocks are not of equal sizes then also we need to return 
+        if (outputBytesRead != inputBytesRead) {
+            free(buffer1);
+            free(buffer2);
+            return false;
+        }
+
         // compare both the blocks 
-        for(ssize_t i=0; i<=inputBytesRead; ++i) {
+        for(ssize_t i=0; i<inputBytesRead; ++i) {
             if(buffer1[i]!=buffer2[i]) {
                 free(buffer1);
                 free(buffer2);
@@ -324,7 +331,7 @@ bool isPartialReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSiz
     // check the correctness from 0 to startIndex-1
     off_t low = 0;
     off_t high = startIndex - 1;
-    while(low<startIndex) {
+    while(low<=startIndex-1) {
         ssize_t bytesRead = blockSize;
         if(low+bytesRead>startIndex) {
             bytesRead = startIndex-low;
@@ -417,7 +424,7 @@ bool isPartialReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSiz
     // endIndex+1 to EOF check check whether the contents are reversed properly 
     low = endIndex+1;
     high = fileSize-1;
-    while(low<fileSize) {
+    while(low<=fileSize-1) {
         ssize_t bytesRead = blockSize;
         if(low+bytesRead>fileSize) {
             bytesRead = fileSize-low;

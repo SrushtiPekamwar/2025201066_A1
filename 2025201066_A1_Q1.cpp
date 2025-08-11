@@ -1,3 +1,9 @@
+// make some changes with the sleep time 
+// change the progress bar 
+// check whether all sys calls are used or not 
+// Add a readme file 
+// flag 0 and flag 2 are not working on very large files 
+
 #include<stdio.h>
 #include<unistd.h> // contains read, write, close sys calls
 #include<cstring>
@@ -7,9 +13,6 @@
 #include<libgen.h> // for basename function
 #include<sys/stat.h>
 #include<sys/types.h> // mode_t
-#include<iostream>
-
-int sleepValue = 10;
 
 // function to print onto the console, this is just like the wrapper of printf 
 void printOnConsole(const char *msg) {
@@ -288,14 +291,13 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
 
     //-------------------Reverse from 0th index to the startIndex--------------------------
     off_t currOffset = 0;
-    while (currOffset<=startIndex) {
+    while (currOffset<startIndex) {
         ssize_t bytesRead = blockSize;
-        if(currOffset+bytesRead>startIndex+1) {
-            bytesRead = startIndex+1-currOffset;
+        if(currOffset+bytesRead>startIndex) {
+            bytesRead = startIndex-currOffset;
         }
 
-        ssize_t bytesStored = read(inputFileDesc,buffer,bytesRead);
-        if(bytesStored==-1) {
+        if(read(inputFileDesc,buffer,bytesRead)==-1) {
             printOnConsole("Error while reading the input file\n");
             free(buffer);
             if(inputFileDesc>=0) close(inputFileDesc);
@@ -303,12 +305,10 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
             _exit(1);
         }
 
-        if(bytesStored<=0) break;
-
         // Reversing the contents of the current block
-        singleBlockReversal(buffer,bytesStored);
+        singleBlockReversal(buffer,bytesRead);
 
-        if(write(outputFileDesc,buffer,bytesStored)==-1) {
+        if(write(outputFileDesc,buffer,bytesRead)==-1) {
             printOnConsole("Error while writing to the ouptut file\n");
             free(buffer);
             if(inputFileDesc>=0) close(inputFileDesc);
@@ -316,7 +316,7 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
             _exit(1);
         }
         // Current offset value updation
-        currOffset += bytesStored;
+        currOffset += bytesRead;
 
         float totalProgress = (currOffset*100.0)/fileSize;
         progressBar(totalProgress);
@@ -324,14 +324,13 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
     }
 
     //-----------------Keep the values from startIndex+1 to endIndex-1 as same---------------
-    while(currOffset<endIndex) {
+    while(currOffset<=endIndex) {
         ssize_t bytesRead = blockSize;
-        if(currOffset+bytesRead>endIndex) {
-            bytesRead = endIndex-currOffset;
+        if(currOffset+bytesRead-1>endIndex) {
+            bytesRead = endIndex-currOffset+1;
         }
 
-        ssize_t bytesStored = read(inputFileDesc,buffer,bytesRead);
-        if(bytesStored==-1) {
+        if(read(inputFileDesc,buffer,bytesRead)==-1) {
             printOnConsole("Error while reading the input file\n");
             free(buffer);
             if(inputFileDesc>=0) close(inputFileDesc);
@@ -339,9 +338,7 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
             _exit(1);
         }
 
-        if(bytesStored==0) break;
-
-        if(write(outputFileDesc,buffer,bytesStored)==-1) {
+        if(write(outputFileDesc,buffer,bytesRead)==-1) {
             printOnConsole("Error while writing to the ouptut file\n");
             free(buffer);
             if(inputFileDesc>=0) close(inputFileDesc);
@@ -349,7 +346,7 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
             _exit(1);
         }
         // Current offset value updation
-        currOffset += bytesStored;
+        currOffset += bytesRead;
 
         float totalProgress = (currOffset*100.0)/fileSize;
         progressBar(totalProgress);
@@ -357,28 +354,56 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
     }
 
     //---------------------Reverse the file from endIndex+1 to the EOF--------------------------
-    while (currOffset<fileSize) {
-        ssize_t bytesRead = read(inputFileDesc, buffer, blockSize);
-        if(bytesRead==-1) {
+    off_t readPos = fileSize;  // start from EOF
+    off_t writePos = endIndex + 1;
+
+    // Loop backwards in the input file
+    while (readPos > endIndex + 1) {
+        ssize_t bytesRead = blockSize;
+        if (readPos - bytesRead < endIndex + 1) {
+            bytesRead = readPos - (endIndex + 1);
+        }
+
+        readPos -= bytesRead; // Move backwards
+
+        if (lseek(inputFileDesc, readPos, SEEK_SET) == -1) {
+            printOnConsole("Error while seeking the input file\n");
+            free(buffer);
+            if (inputFileDesc >= 0) close(inputFileDesc);
+            if (outputFileDesc >= 0) close(outputFileDesc);
+            _exit(1);
+        }
+
+        if (read(inputFileDesc, buffer, bytesRead) == -1) {
             printOnConsole("Error while reading the input file\n");
             free(buffer);
-            if(inputFileDesc>=0) close(inputFileDesc);
-            if(outputFileDesc>=0) close(outputFileDesc);
+            if (inputFileDesc >= 0) close(inputFileDesc);
+            if (outputFileDesc >= 0) close(outputFileDesc);
             _exit(1);
         }
-        if(bytesRead<=0) break;
 
-        singleBlockReversal(buffer,bytesRead);
+        // Reverse this block
+        singleBlockReversal(buffer, bytesRead);
 
-        if(write(outputFileDesc,buffer,bytesRead)==-1) {
+        if (lseek(outputFileDesc, writePos, SEEK_SET) == -1) {
+            printOnConsole("Error while seeking the output file\n");
+            free(buffer);
+            if (inputFileDesc >= 0) close(inputFileDesc);
+            if (outputFileDesc >= 0) close(outputFileDesc);
+            _exit(1);
+        }
+
+        if (write(outputFileDesc, buffer, bytesRead) == -1) {
             printOnConsole("Error while writing output file\n");
             free(buffer);
-            if(inputFileDesc>=0) close(inputFileDesc);
-            if(outputFileDesc>=0) close(outputFileDesc);
+            if (inputFileDesc >= 0) close(inputFileDesc);
+            if (outputFileDesc >= 0) close(outputFileDesc);
             _exit(1);
         }
-        currOffset+=bytesRead;
-        progressBar((currOffset*100.0)/fileSize);
+
+        writePos += bytesRead;
+
+        progressBar((writePos * 100.0) / fileSize);
     }
     free(buffer);
 }
@@ -594,7 +619,7 @@ int main(int argc, char *argv[]) {
             }
 
             // reverse the first and last portion of the file 
-            partialReversal(originalFileDesc,outputFileDesc,originalFileSize,startInd-1,endInd+1);
+            partialReversal(originalFileDesc,outputFileDesc,originalFileSize,startInd,endInd);
 
             // close the file 
             close(originalFileDesc);
