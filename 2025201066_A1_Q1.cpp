@@ -354,56 +354,48 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
     }
 
     //---------------------Reverse the file from endIndex+1 to the EOF--------------------------
-    off_t readPos = fileSize;  // start from EOF
-    off_t writePos = endIndex + 1;
+    off_t readFrom=fileSize, writeTo=endIndex+1;
 
-    // Loop backwards in the input file
-    while (readPos > endIndex + 1) {
+    // reading of the file needs to be done from the back and then we need to reverse 
+    // it and then write it from endIndex+1
+    while(readFrom>endIndex+1) {
         ssize_t bytesRead = blockSize;
-        if (readPos - bytesRead < endIndex + 1) {
-            bytesRead = readPos - (endIndex + 1);
+        if(readFrom-bytesRead<endIndex+1) {
+            bytesRead = readFrom-endIndex-1;
         }
-
-        readPos -= bytesRead; // Move backwards
-
-        if (lseek(inputFileDesc, readPos, SEEK_SET) == -1) {
+        readFrom -= bytesRead;
+        if(lseek(inputFileDesc,readFrom,SEEK_SET)==-1) {
             printOnConsole("Error while seeking the input file\n");
             free(buffer);
-            if (inputFileDesc >= 0) close(inputFileDesc);
-            if (outputFileDesc >= 0) close(outputFileDesc);
+            close(inputFileDesc);
+            close(outputFileDesc);
             _exit(1);
         }
-
-        if (read(inputFileDesc, buffer, bytesRead) == -1) {
+        if(read(inputFileDesc,buffer,bytesRead)==-1) {
             printOnConsole("Error while reading the input file\n");
             free(buffer);
-            if (inputFileDesc >= 0) close(inputFileDesc);
-            if (outputFileDesc >= 0) close(outputFileDesc);
+            close(inputFileDesc);
+            close(outputFileDesc);
             _exit(1);
         }
+        singleBlockReversal(buffer,bytesRead);
 
-        // Reverse this block
-        singleBlockReversal(buffer, bytesRead);
-
-        if (lseek(outputFileDesc, writePos, SEEK_SET) == -1) {
+        if(lseek(outputFileDesc,writeTo,SEEK_SET)==-1) {
             printOnConsole("Error while seeking the output file\n");
             free(buffer);
-            if (inputFileDesc >= 0) close(inputFileDesc);
-            if (outputFileDesc >= 0) close(outputFileDesc);
+            close(inputFileDesc);
+            close(outputFileDesc);
             _exit(1);
         }
-
-        if (write(outputFileDesc, buffer, bytesRead) == -1) {
+        if(write(outputFileDesc,buffer,bytesRead)==-1) {
             printOnConsole("Error while writing output file\n");
             free(buffer);
-            if (inputFileDesc >= 0) close(inputFileDesc);
-            if (outputFileDesc >= 0) close(outputFileDesc);
+            close(inputFileDesc);
+            close(outputFileDesc);
             _exit(1);
         }
-
-        writePos += bytesRead;
-
-        progressBar((writePos * 100.0) / fileSize);
+        writeTo+=bytesRead;
+        progressBar((writeTo*100.0)/fileSize);
     }
     free(buffer);
 }
