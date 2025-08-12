@@ -274,7 +274,7 @@ void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
 // reverse the file when start and end index are given
 void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long long startIndex, long long endIndex) {
     // reverse from 0 to start and then reverse from end to eof
-    ssize_t blockSize = 1024;
+    ssize_t blockSize = 4096;
     char* buffer = (char*)malloc((int)blockSize);
     if(buffer==NULL) {
         printOnConsole("Memory allocation was unsuccessful\n");
@@ -283,68 +283,54 @@ void partialReversal(int inputFileDesc, int outputFileDesc, off_t fileSize, long
         _exit(1);
     }
 
-    //-------------------Reverse from 0th index to the startIndex--------------------------
-    off_t currOffset = 0;
-    while (currOffset<startIndex) {
+    //-------------------Reverse from 0th index to the startIndex-1--------------------------
+    reverseTheFile(inputFileDesc,outputFileDesc,startIndex);
+
+    //-----------------Keep the values from startIndex to endIndex as same---------------
+    off_t currOffset = startIndex;
+    while (currOffset<=endIndex) {
         ssize_t bytesRead = blockSize;
-        if(currOffset+bytesRead>startIndex) {
-            bytesRead = startIndex-currOffset;
-        }
-
-        if(read(inputFileDesc,buffer,bytesRead)==-1) {
-            printOnConsole("Error while reading the input file\n");
-            free(buffer);
-            if(inputFileDesc>=0) close(inputFileDesc);
-            if(outputFileDesc>=0) close(outputFileDesc);
-            _exit(1);
-        }
-
-        // Reversing the contents of the current block
-        singleBlockReversal(buffer,bytesRead);
-
-        if(write(outputFileDesc,buffer,bytesRead)==-1) {
-            printOnConsole("Error while writing to the ouptut file\n");
-            free(buffer);
-            if(inputFileDesc>=0) close(inputFileDesc);
-            if(outputFileDesc>=0) close(outputFileDesc);
-            _exit(1);
-        }
-        // Current offset value updation
-        currOffset += bytesRead;
-
-        float totalProgress = (currOffset*100.0)/fileSize;
-        progressBar(totalProgress);
-        // usleep(sleepValue); 
-    }
-
-    //-----------------Keep the values from startIndex+1 to endIndex-1 as same---------------
-    while(currOffset<=endIndex) {
-        ssize_t bytesRead = blockSize;
-        if(currOffset+bytesRead-1>endIndex) {
+        if (currOffset+bytesRead-1>endIndex) {
             bytesRead = endIndex-currOffset+1;
         }
 
-        if(read(inputFileDesc,buffer,bytesRead)==-1) {
-            printOnConsole("Error while reading the input file\n");
+        // Seek to correct position in both files
+        if(lseek(inputFileDesc,currOffset,SEEK_SET)==-1) {
+            printOnConsole("Error while seeking input file\n");
             free(buffer);
-            if(inputFileDesc>=0) close(inputFileDesc);
-            if(outputFileDesc>=0) close(outputFileDesc);
+            close(inputFileDesc);
+            close(outputFileDesc);
             _exit(1);
         }
 
-        if(write(outputFileDesc,buffer,bytesRead)==-1) {
-            printOnConsole("Error while writing to the ouptut file\n");
+        if(read(inputFileDesc,buffer,bytesRead)==-1) {
+            printOnConsole("Error while reading input file\n");
             free(buffer);
-            if(inputFileDesc>=0) close(inputFileDesc);
-            if(outputFileDesc>=0) close(outputFileDesc);
+            close(inputFileDesc);
+            close(outputFileDesc);
             _exit(1);
         }
-        // Current offset value updation
-        currOffset += bytesRead;
+
+        if (lseek(outputFileDesc,currOffset,SEEK_SET)==-1) {
+            printOnConsole("Error while seeking output file\n");
+            free(buffer);
+            close(inputFileDesc);
+            close(outputFileDesc);
+            _exit(1);
+        }
+
+        if (write(outputFileDesc,buffer,bytesRead)==-1) {
+            printOnConsole("Error while writing to output file\n");
+            free(buffer);
+            close(inputFileDesc);
+            close(outputFileDesc);
+            _exit(1);
+        }
+
+        currOffset+=bytesRead;
 
         float totalProgress = (currOffset*100.0)/fileSize;
         progressBar(totalProgress);
-        // usleep(sleepValue); 
     }
 
     //---------------------Reverse the file from endIndex+1 to the EOF--------------------------

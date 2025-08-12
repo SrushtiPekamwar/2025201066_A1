@@ -313,7 +313,7 @@ bool isFileReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSize) 
 
 // check if the contents have been correctly processed for the partial file reversal
 bool isPartialReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSize, const char* startInd, const char* endInd) {
-    ssize_t blockSize = 1024;
+    ssize_t blockSize = 4096;
     char* buffer1 = (char*)malloc(blockSize);
     char* buffer2 = (char*)malloc(blockSize);
     if(buffer1==NULL || buffer2==NULL) {
@@ -380,7 +380,7 @@ bool isPartialReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSiz
     ssize_t i = startIndex;
     while(i<=endIndex) {
         ssize_t bytesRead = blockSize;
-        if(i+bytesRead>endIndex) {
+        if(i+bytesRead>endIndex) { // i+bytesRead-1 > endIndex
             bytesRead = endIndex+1-i;
         }
 
@@ -419,7 +419,6 @@ bool isPartialReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSiz
         }
         i+=bytesRead;
     }
-
     // endIndex+1 to EOF check check whether the contents are reversed properly 
     low = endIndex+1;
     high = fileSize-1;
