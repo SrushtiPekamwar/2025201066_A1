@@ -194,22 +194,7 @@ bool isBlockwiseReversalValid(int inputFileDesc, int outputFileDesc, long long b
     off_t currOffset = 0;
     while (currOffset<fileSize) {
         ssize_t inputBytesRead = read(inputFileDesc,buffer1,(ssize_t)blockSize);
-        if(inputBytesRead==-1) {
-            printOnConsole("Error while reading the old file\n");
-            free(buffer1); free(buffer2);
-            if(inputFileDesc>=0) close(inputFileDesc);
-            if(outputFileDesc>=0) close(outputFileDesc);
-            _exit(1);
-        }
-
         ssize_t outputBytesRead = read(outputFileDesc,buffer2,(ssize_t)blockSize);
-        if(outputBytesRead==-1) {
-            printOnConsole("Error while reading the old file\n");
-            free(buffer1); free(buffer2);
-            if(inputFileDesc>=0) close(inputFileDesc);
-            if(outputFileDesc>=0) close(outputFileDesc);
-            _exit(1);
-        }
 
         if(inputBytesRead==0 && outputBytesRead==0) {
             free(buffer1);
@@ -265,36 +250,14 @@ bool isFileReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSize) 
     
     off_t index = 0;
     while(index<fileSize) {
-        // read input file from the front and read the output file from the back
         size_t n = blocksize;
+
+        // read the input file from the front
         size_t readBytes = read(inputFileDesc,buffer1,n);
-        if(readBytes==-1) {
-            printOnConsole("Error while reading the input file\n");
-            free(buffer1);
-            free(buffer2);
-            if(inputFileDesc>=0) close(inputFileDesc);
-            if(outputFileDesc>=0) close(outputFileDesc);
-            _exit(1);
-        }
 
-        // set the fd to the end 
-        if(lseek(outputFileDesc,fileSize-index-readBytes,SEEK_SET)==-1) {
-            printOnConsole("Error while seeking the input file\n");
-            free(buffer1);
-            free(buffer2);
-            if(inputFileDesc>=0) close(inputFileDesc);
-            if(outputFileDesc>=0) close(outputFileDesc);
-            _exit(1);
-        }
-
-        if(read(outputFileDesc,buffer2,readBytes)==-1) {
-            printOnConsole("Error while reading the output file\n");
-            free(buffer1);
-            free(buffer2);
-            if(inputFileDesc>=0) close(inputFileDesc);
-            if(outputFileDesc>=0) close(outputFileDesc);
-            _exit(1);
-        }
+        // set the fd to the end and read the output file from back
+        lseek(outputFileDesc,fileSize-index-readBytes,SEEK_SET);
+        read(outputFileDesc,buffer2,readBytes);
 
         // reversing the single buffer block
         singleBlockReversal(buffer2,readBytes);
@@ -336,32 +299,12 @@ bool isPartialReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSiz
             bytesRead = startIndex-low;
         }
         // read the input file from the front 
-        if(lseek(inputFileDesc,low,SEEK_SET)==-1) {
-            printOnConsole("Error while seeking the input file\n");
-            free(buffer1);
-            free(buffer2);
-            _exit(1);
-        }
-        if(read(inputFileDesc,buffer1,bytesRead)==-1) {
-            printOnConsole("Error while reading the input file\n");
-            free(buffer1);
-            free(buffer2);
-            _exit(1);
-        }
+        lseek(inputFileDesc,low,SEEK_SET);
+        read(inputFileDesc,buffer1,bytesRead);
 
         // read the output file from the back
-        if(lseek(outputFileDesc,high-bytesRead+1,SEEK_SET)==-1) {
-            printOnConsole("Error while seeking the output file\n");
-            free(buffer1);
-            free(buffer2);
-            _exit(1);
-        }
-        if(read(outputFileDesc,buffer2,bytesRead)==-1) {
-            printOnConsole("Error while reading the output file\n");
-            free(buffer1);
-            free(buffer2);
-            _exit(1);
-        }
+        lseek(outputFileDesc,high-bytesRead+1,SEEK_SET);
+        read(outputFileDesc,buffer2,bytesRead);
         singleBlockReversal(buffer2,bytesRead);
 
         // compare the input and the output buffer
