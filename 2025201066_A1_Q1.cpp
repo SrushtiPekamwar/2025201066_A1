@@ -1,9 +1,3 @@
-// make some changes with the sleep time 
-// change the progress bar 
-// check whether all sys calls are used or not 
-// Add a readme file 
-// flag 0 and flag 2 are not working on very large files 
-
 #include<stdio.h>
 #include<unistd.h> // contains read, write, close sys calls
 #include<cstring>
@@ -225,7 +219,7 @@ void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
     // we need to move the pointer to the end
     off_t offset = filesize, index = filesize;
     off_t progress = 0;
-    int blocksize = 1024;
+    int blocksize = 4096;
 
     // allocating in the heap so that there won't be any stack overflow 
     char *buffer = (char*)malloc(blocksize);
@@ -270,7 +264,7 @@ void reverseTheFile(int inputFileDesc, int outputFileDesc, off_t filesize) {
         };
         progress+=n;
         index-=n;
-        int totalProgress = (progress*100)/filesize;
+        float totalProgress = (progress*100.0)/filesize;
         progressBar(totalProgress);
         // usleep(10000); 
     }
@@ -414,7 +408,6 @@ int createOutputFile(const char *directoryName, const char *filepath, long long 
     }
     return outputFileDesc;
 }
-
 
 int main(int argc, char *argv[]) {
     if(argc<3) {

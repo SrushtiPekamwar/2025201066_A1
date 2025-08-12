@@ -1,7 +1,6 @@
-// make some changes with the sleep time 
-// change the progress bar 
 // check whether all sys calls are used or not 
-// Add a readme file 
+// Add a readme file
+// add comments and then change
 
 #include<stdio.h>
 #include<unistd.h> // contains read, write, close sys calls
@@ -13,7 +12,7 @@
 #include<sys/stat.h>
 #include<sys/types.h> // mode_t
 
-int sleepValue = 10;
+// int sleepValue = 10;
 
 // function to print onto the console, this is just like the wrapper of printf 
 void printOnConsole(const char *msg) {
@@ -252,7 +251,7 @@ bool isBlockwiseReversalValid(int inputFileDesc, int outputFileDesc, long long b
 // check if the contents have been correctly processed for the complete file reversal
 bool isFileReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSize) {
     off_t offset = fileSize;
-    int blocksize = 1024;
+    int blocksize = 4096;
 
     // allocating in the heap so that there won't be any stack overflow 
     char *buffer1 = (char*)malloc(blocksize);
@@ -578,7 +577,7 @@ int createOutputFile(const char *directoryName, const char *filepath, long long 
     const char* outputFileName = basename(copyOfPath);   // base name of the file 
     snprintf(completePath, sizeof(completePath), "%s/%lld_%s", directoryName,flag,outputFileName);
 
-    int outputFileDesc = open(completePath, O_CREAT | O_WRONLY | O_TRUNC, 0600); // read and write permissions
+    int outputFileDesc = open(completePath,O_RDONLY);
     if(outputFileDesc==-1) {
         printOnConsole("Error while creating the output file\n");
         _exit(1);

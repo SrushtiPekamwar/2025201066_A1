@@ -1,3 +1,4 @@
+#define _FILE_OFFSET_BITS 64
 #include <fcntl.h>
 #include <unistd.h>
 #include <stdio.h>
@@ -18,14 +19,13 @@ void genRandomBuff(char buff[], int size) {
 }
 
 int main(int argc, char* argv[]) {
-    char fname[256];
-    strcpy(fname, "input.txt");
-    long long fsize = 1000000;
+    char fname[256] = "input.txt";
+    long long fsize = 1000000LL; // default
 
     if (argc >= 2) strcpy(fname, argv[1]);
     if (argc >= 3) fsize = strtoll(argv[2], NULL, 10);
 
-    srand(time(NULL)); // random seed
+    srand(time(NULL));
 
     int ofd = open(fname, O_CREAT | O_WRONLY | O_TRUNC, 0644);
     if (ofd == -1) {
@@ -57,7 +57,7 @@ int main(int argc, char* argv[]) {
         }
         written += bufferSize;
 
-        if (i % 500 == 0) {
+        if (i % 100 == 0) { // update progress more frequently
             gettimeofday(&curr, NULL);
             double elapsed = (curr.tv_sec - start.tv_sec) +
                              (curr.tv_usec - start.tv_usec) / 1000000.0;
