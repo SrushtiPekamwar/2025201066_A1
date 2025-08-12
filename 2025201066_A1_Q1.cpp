@@ -186,7 +186,7 @@ void performBlockwiseReversal(int inputFileDesc, int outputFileDesc, long long b
         write(outputFileDesc,buffer,bytesRead);
 
         // Current offset value updation
-        currOffset += bytesRead;
+        currOffset+=bytesRead;
 
         float totalProgress = (currOffset*100.0)/fileSize;
         progressBar(totalProgress);

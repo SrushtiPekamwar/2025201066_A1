@@ -1,6 +1,8 @@
 // check whether all sys calls are used or not 
 // Add a readme file
 // add comments and then change
+// change the couts
+// change the permissions of the input file 
 
 #include<stdio.h>
 #include<unistd.h> // contains read, write, close sys calls
@@ -11,6 +13,7 @@
 #include<libgen.h> // for basename function
 #include<sys/stat.h>
 #include<sys/types.h> // mode_t
+#include<iostream>
 
 // int sleepValue = 10;
 
@@ -39,22 +42,19 @@ long long isBlockSizeValid(const char *c) {
     long long maxBlockSize = LLONG_MAX;
     char* endptr;  // endptr will point to the first invalid character after the number
     long long blocksize = strtoll(c, &endptr, 10);
-    if (*endptr != '\0') {
+    if (*endptr!='\0') {
         printOnConsole("Invalid block size, block size must be an integer\n");
         _exit(1);
     }
-
     if(blocksize<=0) {
         printOnConsole("Block size should be positive\n");
         _exit(1);
     }
-
     // to avoid overflow 
     if(blocksize>maxBlockSize) {
         printOnConsole("Overflow: Block size very large\n");
         _exit(1);
     }
-
     return blocksize;
 }
 
@@ -63,12 +63,12 @@ void isIndexValid(const char *startIndex, const char *endIndex, off_t filesize) 
     char* endptr;  // endptr will point to the first invalid character after the number
     long long maximum = LLONG_MAX;
     long long startInd = strtoll(startIndex,&endptr,10);
-    if (*endptr != '\0') {
+    if (*endptr!='\0') {
         printOnConsole("Start index should be an integer\n");
         _exit(1);
     }
     long long endInd = strtoll(endIndex,&endptr,10);
-    if(*endptr != '\0') {
+    if(*endptr!='\0') {
         printOnConsole("End index should be an integer\n");
         _exit(1);
     }
@@ -83,16 +83,16 @@ void isIndexValid(const char *startIndex, const char *endIndex, off_t filesize) 
         printOnConsole("Overflow: Index size is very large\n");
         _exit(1);
     }
-
+    
     // start index should be less than the file size 
     if(startInd>=filesize) {
-        printOnConsole("Start index must be less than the file size\n");
+        std::cout << "Start index must be less than " << (long long)filesize << std::endl;
         _exit(1);
     }
 
     // end should be less than the file size 
     if(endInd>=filesize) {
-        printOnConsole("End index must be less than the file size\n");
+        std::cout << "End index must be less than " << (long long)filesize << std::endl;
         _exit(1);
     }
 
@@ -105,17 +105,17 @@ void isIndexValid(const char *startIndex, const char *endIndex, off_t filesize) 
 
 int isFlagValid(const char *c) {
     char* endptr;
-    long long flag = strtoll(c, &endptr, 10);
+    long long flag = strtoll(c,&endptr,10);
 
     // Check if flag is a valid integer
-    if (*endptr != '\0') {
+    if (*endptr!='\0') {
         printOnConsole("Flag value must be an integer either 0, 1 or 2\n\n");
         printCommandUsage();
         _exit(1);
     }
 
     // Check if flag is in allowed range
-    if (flag != 0 && flag != 1 && flag != 2) {
+    if (flag!=0 && flag!=1 && flag!=2) {
         printOnConsole("Invalid flag value, valid flags values are 0, 1, or 2\n\n");
         printCommandUsage();
         _exit(1);
@@ -132,7 +132,7 @@ void printInteger(long long number) {
 void fileValidation(const char* filePath) {
     // open in read only mode 
     int fileDesc = open(filePath,O_RDONLY);
-    if (fileDesc == -1) {
+    if (fileDesc==-1) {
         if (errno==ENOENT) {
             printOnConsole(filePath);
             printOnConsole(" :No such file exists\n");
@@ -151,7 +151,7 @@ void directoryValidation(const char *directoryName) {
     // Check if the directory exists
     if (stat(directoryName,&stats)==0) {
         printOnConsole(directoryName);
-        printOnConsole(" directory is created: Yes\n");
+        printOnConsole(" directory is created?: Yes\n");
         return;
     }
     else {
@@ -166,7 +166,7 @@ void progressBar(float totalProgress) {
     printOnConsole("Progress: ");
     char buffer[16];
     // we are just storing the string in the buffer instead of printing it to the screen with the help of snprintf
-    snprintf(buffer, sizeof(buffer), "%.2f%%", totalProgress);
+    snprintf(buffer,sizeof(buffer),"%.2f%%",totalProgress);
     printOnConsole(buffer);
     fflush(stdout);
 }
@@ -186,8 +186,6 @@ bool isBlockwiseReversalValid(int inputFileDesc, int outputFileDesc, long long b
     char* buffer2 = (char*)malloc(blockSize);
     if(buffer1==NULL || buffer2==NULL) {
         printOnConsole("Memory allocation was unsuccessful\n");
-        if(inputFileDesc>=0) close(inputFileDesc);
-        if(outputFileDesc>=0) close(outputFileDesc);
         _exit(1);
     }
 
@@ -201,7 +199,7 @@ bool isBlockwiseReversalValid(int inputFileDesc, int outputFileDesc, long long b
             free(buffer2);
             return true;
         }
-        else if((inputBytesRead==0 && outputBytesRead!=0) || (inputBytesRead!=0 && outputBytesRead==0)) {
+        else if((inputBytesRead==0 && outputBytesRead!=0)||(inputBytesRead!=0 && outputBytesRead==0)) {
             free(buffer1);
             free(buffer2);
             return false;
@@ -211,14 +209,14 @@ bool isBlockwiseReversalValid(int inputFileDesc, int outputFileDesc, long long b
         singleBlockReversal(buffer2,outputBytesRead);
 
         // if the last read blocks are not of equal sizes then also we need to return 
-        if (outputBytesRead != inputBytesRead) {
+        if(outputBytesRead!=inputBytesRead) {
             free(buffer1);
             free(buffer2);
             return false;
         }
 
         // compare both the blocks 
-        for(ssize_t i=0; i<inputBytesRead; ++i) {
+        for(ssize_t i=0;i<inputBytesRead;++i) {
             if(buffer1[i]!=buffer2[i]) {
                 free(buffer1);
                 free(buffer2);
@@ -226,7 +224,7 @@ bool isBlockwiseReversalValid(int inputFileDesc, int outputFileDesc, long long b
             }
         }
         // Current offset value updation
-        currOffset += inputBytesRead;
+        currOffset+=inputBytesRead;
     }
     free(buffer1);
     free(buffer2);
@@ -243,8 +241,8 @@ bool isFileReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSize) 
     char *buffer2 = (char*)malloc(blocksize);
     if(buffer1==NULL || buffer2==NULL) {
         printOnConsole("Memory allocation was unsuccessful\n");
-        if(inputFileDesc>=0) close(inputFileDesc);
-        if(outputFileDesc>=0) close(outputFileDesc);
+        close(inputFileDesc);
+        close(outputFileDesc);
         _exit(1);
     }
     
@@ -315,8 +313,8 @@ bool isPartialReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSiz
                 return false;
             }
         }
-        low  += bytesRead;
-        high -= bytesRead;
+        low +=bytesRead;
+        high-=bytesRead;
     }
 
     // startIndex to endIndex the content should be same
@@ -417,8 +415,8 @@ bool isPartialReversalValid(int inputFileDesc, int outputFileDesc, off_t fileSiz
     return true;
 }
 
-// check the permissions of the file
-void filePermissions(const char* filepath) {
+// check the permissions for file and directory
+void checkPermissions(const char* filepath, const char *type) {
     // ls -l myfile.txt checking the permissions through cli
     struct stat st;
     if(stat(filepath,&st)==-1) {
@@ -428,73 +426,27 @@ void filePermissions(const char* filepath) {
         _exit(1);
     }
 
-    char buffer[256];
+    std::cout << "User has read permissions on " << type << " " << filepath << ": " << ((st.st_mode & S_IRUSR) ? "Yes" : "No") << std::endl;
+    std::cout << "User has write permissions on " << type << " " << filepath << ": " << ((st.st_mode & S_IWUSR) ? "Yes" : "No") << std::endl;
+    std::cout << "User has execute permissions on " << type << " " << filepath << ": " << ((st.st_mode & S_IXUSR) ? "Yes" : "No") << std::endl;
 
-    snprintf(buffer, sizeof(buffer),"User has read permissions on file %s: %s\n",filepath,(st.st_mode & S_IRUSR) ? "Yes" : "No");
-    printOnConsole(buffer);
-    snprintf(buffer, sizeof(buffer),"User has write permissions on file %s: %s\n",filepath,(st.st_mode & S_IWUSR) ? "Yes" : "No");
-    printOnConsole(buffer);
-    snprintf(buffer, sizeof(buffer),"User has execute permissions on file %s: %s\n",filepath,(st.st_mode & S_IXUSR) ? "Yes" : "No");
-    printOnConsole(buffer);
+    std::cout << "Group has read permissions on " << type << " " << filepath << ": " << ((st.st_mode & S_IRGRP) ? "Yes" : "No") << std::endl;
+    std::cout << "Group has write permissions on " << type << " " << filepath << ": " << ((st.st_mode & S_IWGRP) ? "Yes" : "No") << std::endl;
+    std::cout << "Group has execute permissions on " << type << " " << filepath << ": " << ((st.st_mode & S_IXGRP) ? "Yes" : "No") << std::endl;
 
-    snprintf(buffer, sizeof(buffer),"Group has read permissions on file %s: %s\n",filepath,(st.st_mode & S_IRGRP) ? "Yes" : "No");
-    printOnConsole(buffer);
-    snprintf(buffer, sizeof(buffer),"Group has write permissions on file %s: %s\n",filepath,(st.st_mode & S_IWGRP) ? "Yes" : "No");
-    printOnConsole(buffer);
-    snprintf(buffer, sizeof(buffer),"Group has execute permissions on file %s: %s\n",filepath,(st.st_mode & S_IXGRP) ? "Yes" : "No");
-    printOnConsole(buffer);
-
-    snprintf(buffer, sizeof(buffer),"Others has read permissions on file %s: %s\n",filepath,(st.st_mode & S_IROTH) ? "Yes" : "No");
-    printOnConsole(buffer);
-    snprintf(buffer, sizeof(buffer),"Others has write permissions on file %s: %s\n",filepath,(st.st_mode & S_IWOTH) ? "Yes" : "No");
-    printOnConsole(buffer);
-    snprintf(buffer, sizeof(buffer),"Others has execute permissions on file %s: %s\n",filepath,(st.st_mode & S_IXOTH) ? "Yes" : "No");
-    printOnConsole(buffer);
-}
-
-// check the permissions of the directory
-void directoryPermissions(const char* directoryPath) {
-    // ls -ld myfile.txt checking the permissions through cli
-    struct stat st;
-    if(stat(directoryPath,&st)==-1) {
-        printOnConsole(directoryPath);
-        perror(" :Error while calculating the directory stats");
-        printOnConsole("\n");
-        _exit(1);
-    }
-
-    char buffer[256];
-
-    snprintf(buffer, sizeof(buffer),"User has read permissions on directory %s: %s\n",directoryPath,(st.st_mode & S_IRUSR) ? "Yes" : "No");
-    printOnConsole(buffer);
-    snprintf(buffer, sizeof(buffer),"User has write permissions on directory %s: %s\n",directoryPath,(st.st_mode & S_IWUSR) ? "Yes" : "No");
-    printOnConsole(buffer);
-    snprintf(buffer, sizeof(buffer),"User has execute permissions on directory %s: %s\n",directoryPath,(st.st_mode & S_IXUSR) ? "Yes" : "No");
-    printOnConsole(buffer);
-
-    snprintf(buffer, sizeof(buffer),"Group has read permissions on directory %s: %s\n",directoryPath,(st.st_mode & S_IRGRP) ? "Yes" : "No");
-    printOnConsole(buffer);
-    snprintf(buffer, sizeof(buffer),"Group has write permissions on directory %s: %s\n",directoryPath,(st.st_mode & S_IWGRP) ? "Yes" : "No");
-    printOnConsole(buffer);
-    snprintf(buffer, sizeof(buffer),"Group has execute permissions on directory %s: %s\n",directoryPath,(st.st_mode & S_IXGRP) ? "Yes" : "No");
-    printOnConsole(buffer);
-
-    snprintf(buffer, sizeof(buffer),"Others has read permissions on directory %s: %s\n",directoryPath,(st.st_mode & S_IROTH) ? "Yes" : "No");
-    printOnConsole(buffer);
-    snprintf(buffer, sizeof(buffer),"Others has write permissions on directory %s: %s\n",directoryPath,(st.st_mode & S_IWOTH) ? "Yes" : "No");
-    printOnConsole(buffer);
-    snprintf(buffer, sizeof(buffer),"Others has execute permissions on directory %s: %s\n",directoryPath,(st.st_mode & S_IXOTH) ? "Yes" : "No");
-    printOnConsole(buffer);
+    std::cout << "Others have read permissions on " << type << " " << filepath << ": " << ((st.st_mode & S_IROTH) ? "Yes" : "No") << std::endl;
+    std::cout << "Others have write permissions on " << type << " " << filepath << ": " << ((st.st_mode & S_IWOTH) ? "Yes" : "No") << std::endl;
+    std::cout << "Others have execute permissions on " << type << " " << filepath << ": " << ((st.st_mode & S_IXOTH) ? "Yes" : "No") << std::endl;
 }
 
 void isFileSizeSame(const char* newFile, const char* oldFile) {
     struct stat stats1, stats2;
-    if (stat(newFile, &stats1)==-1) {
+    if (stat(newFile,&stats1)==-1) {
         printOnConsole(newFile);
         printOnConsole(" :Error while getting stats\n");
         _exit(1);
     }
-    if (stat(oldFile, &stats2)==-1) {
+    if (stat(oldFile,&stats2)==-1) {
         printOnConsole(oldFile);
         printOnConsole(" :Error while getting stats\n");
         _exit(1);
@@ -502,14 +454,13 @@ void isFileSizeSame(const char* newFile, const char* oldFile) {
 
     // compare whether the sizes of both the files are same 
     if(stats1.st_size==stats2.st_size) {
-        printOnConsole("Both files' sizes are same: Yes\n");
+        printOnConsole("Size of both the files is same?: Yes\n");
         return;
     }
     else {
-        printOnConsole("Both files' sizes are same: No\n");
+        printOnConsole("Size of both the files is same?: No\n");
         return;
     }
-
 }
 
 int createOutputFile(const char *directoryName, const char *filepath, long long flag) {
@@ -517,7 +468,7 @@ int createOutputFile(const char *directoryName, const char *filepath, long long 
     char completePath[1024];
     char *copyOfPath = strdup(filepath);
     const char* outputFileName = basename(copyOfPath);   // base name of the file 
-    snprintf(completePath, sizeof(completePath), "%s/%lld_%s", directoryName,flag,outputFileName);
+    snprintf(completePath,sizeof(completePath),"%s/%lld_%s",directoryName,flag,outputFileName);
 
     int outputFileDesc = open(completePath,O_RDONLY);
     if(outputFileDesc==-1) {
@@ -574,19 +525,19 @@ int main(int argc, char *argv[]) {
 
             bool correct = isBlockwiseReversalValid(oldfileDesc,newfileDesc,blocksize,fileSize);
             if(correct==true) {
-                printOnConsole("Contents have been correctly processed : Yes\n");
+                printOnConsole("Contents have been correctly processed? : Yes\n");
             }
             else {
-                printOnConsole("Contents have been correctly processed : No\n");
+                printOnConsole("Contents have been correctly processed? : No\n");
             }
 
             // check whether the file sizes are same 
             isFileSizeSame(newFilepath,oldFilepath);
 
             // check permissions for the files
-            filePermissions(newFilepath);
-            filePermissions(oldFilepath);
-            directoryPermissions(directoryName);
+            checkPermissions(newFilepath,"file");
+            checkPermissions(oldFilepath,"file");
+            checkPermissions(directoryName,"directory");
 
             close(newfileDesc);
             close(oldfileDesc);
@@ -623,19 +574,19 @@ int main(int argc, char *argv[]) {
 
             bool correct = isFileReversalValid(oldfileDesc,newfileDesc,fileSize);
             if(correct==true) {
-                printOnConsole("Contents have been correctly processed : Yes\n");
+                printOnConsole("Contents have been correctly processed? : Yes\n");
             }
             else {
-                printOnConsole("Contents have been correctly processed : No\n");
+                printOnConsole("Contents have been correctly processed? : No\n");
             }
 
             // check whether the file sizes are same 
             isFileSizeSame(newFilepath,oldFilepath);
 
             // check permissions for the files
-            filePermissions(newFilepath);
-            filePermissions(oldFilepath);
-            directoryPermissions(directoryName);
+            checkPermissions(newFilepath,"file");
+            checkPermissions(oldFilepath,"file");
+            checkPermissions(directoryName,"directory");
 
             close(newfileDesc);
             close(oldfileDesc);
@@ -678,24 +629,23 @@ int main(int argc, char *argv[]) {
             // check whether the contents have been correctly processed
             bool correct = isPartialReversalValid(oldfileDesc,newfileDesc,fileSize,startIndex,endIndex);
             if(correct==true) {
-                printOnConsole("Contents have been correctly processed : Yes\n");
+                printOnConsole("Contents have been correctly processed? : Yes\n");
             }
             else {
-                printOnConsole("Contents have been correctly processed : No\n");
+                printOnConsole("Contents have been correctly processed? : No\n");
             }
 
             // check whether the file sizes are same 
             isFileSizeSame(newFilepath,oldFilepath);
 
             // check permissions for the files
-            filePermissions(newFilepath);
-            filePermissions(oldFilepath);
-            directoryPermissions(directoryName);
+            checkPermissions(newFilepath,"file");
+            checkPermissions(oldFilepath,"file");
+            checkPermissions(directoryName,"directory");
 
             close(newfileDesc);
             close(oldfileDesc);
         }
     }
-
     return 0;
 }
