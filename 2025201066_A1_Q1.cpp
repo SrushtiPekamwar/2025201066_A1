@@ -34,16 +34,16 @@ long long isBlockSizeValid(const char *c) {
     char* endptr;  // endptr will point to the first invalid character after the number
     long long blocksize = strtoll(c,&endptr,10);
     if (*endptr!='\0') {
-        printOnConsole("Invalid block size, block size must be an integer\n");
+        printOnConsole("Invalid block size, block size must be an integer");
         _exit(1);
     }
     if(blocksize<=0) {
-        printOnConsole("Block size should be positive\n");
+        printOnConsole("Block size should be positive");
         _exit(1);
     }
     // to avoid overflow 
     if(blocksize>maxBlockSize) {
-        printOnConsole("Overflow: Block size very large\n");
+        printOnConsole("Overflow: Block size very large");
         _exit(1);
     }
     return blocksize;
@@ -381,7 +381,7 @@ int main(int argc, char *argv[]) {
             }
 
             if(blocksize>originalFileSize) {
-                printOnConsole("Warning: Block size is greater than the file size\n");
+                printOnConsole("\033[1;33mWarning: Block size is greater than the file size\033[0m\n");
             } 
 
             // Do block wise reversal 
@@ -419,7 +419,7 @@ int main(int argc, char *argv[]) {
                 return 1;
             } 
             if(originalFileSize==0) {
-                printOnConsole("File is empty\n");
+                printOnConsole("\033[1;33mWarning: File is empty\033[0m\n");
             }
 
             printOnConsole("File size: ");
@@ -477,8 +477,9 @@ int main(int argc, char *argv[]) {
                 return 1;
             }
             if(originalFileSize==0) {
-                printOnConsole("File is empty\n");
+                printOnConsole("\033[1;33mWarning: File is empty\033[0m\n");
             }
+
             isIndexValid(startIndex,endIndex,originalFileSize);
             char *endptr;
             long long startInd = strtoll(startIndex,&endptr,10);

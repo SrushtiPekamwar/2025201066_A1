@@ -1,9 +1,3 @@
-// check whether all sys calls are used or not 
-// Add a readme file
-// add comments and then change
-// change the couts
-// change the permissions of the input file 
-
 #include<stdio.h>
 #include<unistd.h> // contains read, write, close sys calls
 #include<cstring>
@@ -14,8 +8,6 @@
 #include<sys/stat.h>
 #include<sys/types.h> // mode_t
 #include<iostream>
-
-// int sleepValue = 10;
 
 // function to print onto the console, this is just like the wrapper of printf 
 void printOnConsole(const char *msg) {
@@ -129,7 +121,7 @@ void printInteger(long long number) {
     printOnConsole(buffer);
 }
 
-void fileValidation(const char* filePath) {
+void oldFileValidation(const char* filePath) {
     // open in read only mode 
     int fileDesc = open(filePath,O_RDONLY);
     if (fileDesc==-1) {
@@ -146,17 +138,62 @@ void fileValidation(const char* filePath) {
     }
 }
 
-void directoryValidation(const char *directoryName) {
+void newFileValidation(const char* newfilePath, const char* oldfilePath, const char* flag) {
+    // open in read only mode 
+    int fileDesc = open(newfilePath,O_RDONLY);
+    if (fileDesc==-1) {
+        if (errno==ENOENT) {
+            printOnConsole(newfilePath);
+            printOnConsole(" :No such file exists\n");
+            _exit(1);
+        }
+        if(errno==EACCES) {
+            printOnConsole("You don't have required permissions to access this file\n");
+            close(fileDesc);
+            _exit(1);
+        }
+    }
+
+    // let's say the file exists but then its not the valid output file 
+    // like the output file should be of the format flag_input.txt 
+
+    // Copy and normalize output file name
+    char* copyOfPath = strdup(newfilePath);
+    const char* outputFileName = basename(copyOfPath);
+
+    // Copy and normalize old file name
+    char* copyOfOldPath = strdup(oldfilePath);
+    char oldModifiedfile[1024];
+    snprintf(oldModifiedfile, sizeof(oldModifiedfile), "%s_%s", flag, copyOfOldPath);
+
+    // Compare
+    if (strcmp(outputFileName,oldModifiedfile)!=0) {
+        printOnConsole("\033[1;33mWarning: input file exists, but it is not the valid output file for the given input file\n\033[0m");
+    } 
+}
+
+void directoryValidation(const char *directoryName, const char* newFilepath) {
     struct stat stats;
+
+    // extracting the directory name from the file path
+    char filePath2[1024];
+    strncpy(filePath2,newFilepath,sizeof(filePath2));
+    filePath2[sizeof(filePath2)-1]='\0';
+    char *directoryNameExtracted = dirname(filePath2);
+
+    if(strcmp(directoryName,directoryNameExtracted)!=0) {
+        printOnConsole("Output file's directory name does not match with the given directory name\n");
+        _exit(1);
+    }
     // Check if the directory exists
-    if (stat(directoryName,&stats)==0) {
+    else if (stat(directoryName,&stats)==0) {
         printOnConsole(directoryName);
         printOnConsole(" directory is created?: Yes\n");
         return;
     }
     else {
         printOnConsole(directoryName);
-        printOnConsole(" directory does not exist\n");
+        printOnConsole(" directory is created?: No\n");
         _exit(1);
     }
 }
@@ -437,6 +474,7 @@ void checkPermissions(const char* filepath, const char *type) {
     std::cout << "Others have read permissions on " << type << " " << filepath << ": " << ((st.st_mode & S_IROTH) ? "Yes" : "No") << std::endl;
     std::cout << "Others have write permissions on " << type << " " << filepath << ": " << ((st.st_mode & S_IWOTH) ? "Yes" : "No") << std::endl;
     std::cout << "Others have execute permissions on " << type << " " << filepath << ": " << ((st.st_mode & S_IXOTH) ? "Yes" : "No") << std::endl;
+    std::cout << std::endl;
 }
 
 void isFileSizeSame(const char* newFile, const char* oldFile) {
@@ -507,12 +545,13 @@ int main(int argc, char *argv[]) {
             const char* newFilepath = argv[1];
             const char* oldFilepath = argv[2];
             const char* directoryName = argv[3];
+            const char* flagString = argv[4];
             long long blocksize = isBlockSizeValid(argv[5]);
 
             // validations for the files and the directory 
-            fileValidation(newFilepath);
-            fileValidation(oldFilepath);
-            directoryValidation(directoryName);
+            directoryValidation(directoryName,newFilepath);
+            oldFileValidation(oldFilepath);
+            newFileValidation(newFilepath,oldFilepath,flagString);
 
             // file descriptors
             int newfileDesc = open(newFilepath,O_RDONLY);
@@ -535,6 +574,7 @@ int main(int argc, char *argv[]) {
             isFileSizeSame(newFilepath,oldFilepath);
 
             // check permissions for the files
+            std::cout << std::endl;
             checkPermissions(newFilepath,"file");
             checkPermissions(oldFilepath,"file");
             checkPermissions(directoryName,"directory");
@@ -557,11 +597,12 @@ int main(int argc, char *argv[]) {
             const char* newFilepath = argv[1];
             const char* oldFilepath = argv[2];
             const char* directoryName = argv[3];
+            const char* flagString = argv[4];
 
             // validations for the files and the directory 
-            fileValidation(newFilepath);
-            fileValidation(oldFilepath);
-            directoryValidation(directoryName);
+            directoryValidation(directoryName,newFilepath);
+            oldFileValidation(oldFilepath);
+            newFileValidation(newFilepath,oldFilepath,flagString);
 
             // file descriptors
             int newfileDesc = open(newFilepath,O_RDONLY);
@@ -584,6 +625,7 @@ int main(int argc, char *argv[]) {
             isFileSizeSame(newFilepath,oldFilepath);
 
             // check permissions for the files
+            std::cout << std::endl;
             checkPermissions(newFilepath,"file");
             checkPermissions(oldFilepath,"file");
             checkPermissions(directoryName,"directory");
@@ -606,13 +648,14 @@ int main(int argc, char *argv[]) {
             const char* newFilepath = argv[1];
             const char* oldFilepath = argv[2];
             const char* directoryName = argv[3];
+            const char* flagString = argv[4];
             const char* startIndex = argv[5];
             const char* endIndex = argv[6];
 
             // validations for the files and the directory 
-            fileValidation(newFilepath);
-            fileValidation(oldFilepath);
-            directoryValidation(directoryName);
+            directoryValidation(directoryName,newFilepath);
+            oldFileValidation(oldFilepath);
+            newFileValidation(newFilepath,oldFilepath,flagString);
 
             // file descriptors
             int newfileDesc = open(newFilepath,O_RDONLY);
@@ -639,6 +682,7 @@ int main(int argc, char *argv[]) {
             isFileSizeSame(newFilepath,oldFilepath);
 
             // check permissions for the files
+            std::cout << std::endl;
             checkPermissions(newFilepath,"file");
             checkPermissions(oldFilepath,"file");
             checkPermissions(directoryName,"directory");
